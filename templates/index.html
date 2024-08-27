@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">All Reports</h1>
+    
+    <!-- Advanced Search form -->
+    <form method="GET" action="{{ url_for('index') }}">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <input type="text" class="form-control" name="search_query" placeholder="Search..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <select name="search_field" class="form-select">
+                    <option value="all" {% if search_field == 'all' %}selected{% endif %}>All Fields</option>
+                    <option value="reporter" {% if search_field == 'reporter' %}selected{% endif %}>Reporter</option>
+                    <option value="reportee" {% if search_field == 'reportee' %}selected{% endif %}>Reportee</option>
+                    <option value="punishment" {% if search_field == 'punishment' %}selected{% endif %}>Punishment</option>
+                    <option value="date" {% if search_field == 'date' %}selected{% endif %}>Date</option>
+                    <option value="month" {% if search_field == 'month' %}selected{% endif %}>Month</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-danger">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Sort form -->
+    <form method="GET" action="{{ url_for('index') }}" class="mb-3">
+        <input type="hidden" name="search_query" value="{{ search_query }}">
+        <input type="hidden" name="search_field" value="{{ search_field }}">
+        <div class="row">
+            <div class="col">
+                <select name="sort_by" class="form-select">
+                    <option value="date_time" {% if sort_by == 'date_time' %}selected{% endif %}>Date/Time</option>
+                    <option value="month" {% if sort_by == 'month' %}selected{% endif %}>Month</option>
+                    <option value="reporter" {% if sort_by == 'reporter' %}selected{% endif %}>Reporter</option>
+                    <option value="reportee" {% if sort_by == 'reportee' %}selected{% endif %}>Reportee</option>
+                    <option value="report_reason" {% if sort_by == 'report_reason' %}selected{% endif %}>Report Reason</option>
+                    <option value="punishment" {% if sort_by == 'punishment' %}selected{% endif %}>Punishment</option>
+                </select>
+            </div>
+            <div class="col">
+                <select name="sort_order" class="form-select">
+                    <option value="ASC" {% if sort_order == 'ASC' %}selected{% endif %}>Ascending</option>
+                    <option value="DESC" {% if sort_order == 'DESC' %}selected{% endif %}>Descending</option>
+                </select>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-outline-secondary">Sort</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-container">
+        <table class="table mt-3">
+            <thead>
+                <tr class="header-bar">
+                    <th>ID</th>
+                    <th>Date/Time</th>
+                    <th>Reporter</th>
+                    <th>Reportee</th>
+                    <th>Report Reason</th>
+                    <th>Evidence</th>
+                    <th>Punishment</th>
+                    <th>Ban Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                <tr>
+                    <td>{{ report.id }}</td>
+                    <td>{{ report.date_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ report.reporter }}</td>
+                    <td>{{ report.reportee }}</td>
+                    <td>{{ report.report_reason }}</td>
+                    <td>
+                        {% if report.evidence %}
+                            {% for item in report.evidence %}
+                                {% if item.type == 'link' %}
+                                    <a class="btn btn-info btn-sm" href="{{ item.url }}" target="_blank" role="button">View Link</a><br>
+                                {% elif item.type == 'file' %}
+                                    <a class="btn btn-info btn-sm" href="{{ url_for('stream_file', file_path=item.path) }}" role="button">View File</a><br>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </td>                                     
+                    <td>{{ report.punishment }}</td>
+                    <td>
+                        <span class="badge {% if report.ban_status == 'Active' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ report.ban_status }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="button-container">
+                            <a class="btn btn-warning btn-sm" href="{{ url_for('edit_report', id=report.id) }}">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="{{ url_for('delete_report', id=report.id) }}" onclick="return confirm('Are you sure?')">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Advanced Report Statistics</h1>
+<div class="stats-container">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <label for="stat-type" class="form-label">Select Statistic Type:</label>
+            <select class="form-select" id="stat-type" onchange="updateStats()">
+                <option value="total-reports">Total Reports</option>
+                <option value="reports-per-reporter">Reports per Reporter</option>
+                <option value="reports-per-reportee">Reports per Reportee</option>
+                <option value="reports-per-reason">Reports per Reason</option>
+                <option value="monthly-reports">Monthly Reports</option>
+                <!-- Add more options as needed -->
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="chart-type" class="form-label">Select Chart Type:</label>
+            <select class="form-select" id="chart-type" onchange="updateStats()">
+                <option value="bar">Bar Chart</option>
+                <option value="pie">Pie Chart</option>
+                <option value="line">Line Chart</option>
+                <!-- Add more chart types as needed -->
+            </select>
+        </div>
+    </div>
+
+    <div id="stats-display">
+        <!-- Default Statistic: Total Reports -->
+        <h3>Total Reports: <strong>{{ total_reports }}</strong></h3>
+    </div>
+
+    <div id="chart-container">
+        <canvas id="stats-chart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Convert Python data to JavaScript
+    const statsData = {
+        'total-reports': [{ label: 'Total Reports', value: {{ total_reports }} }],
+        'reports-per-reporter': {{ reports_per_reporter|tojson }},
+        'reports-per-reportee': {{ reports_per_reportee|tojson }},
+        'reports-per-reason': {{ reports_per_reason|tojson }},
+        'monthly-reports': {{ monthly_reports|tojson }},
+        // Add more data as needed
+    };
+
+    const ctx = document.getElementById('stats-chart').getContext('2d');
+    let chart = new Chart(ctx, {
+        type: 'bar',
+        data: {},
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    function updateStats() {
+        const statType = document.getElementById('stat-type').value;
+        const chartType = document.getElementById('chart-type').value;
+        const data = statsData[statType] || [];
+
+        let labels = data.map(item => item.label || item.reporter || item.reportee || item.report_reason || item.month);
+        let values = data.map(item => item.value || item.count);
+
+        chart.data.labels = labels;
+        chart.data.datasets = [{
+            label: 'Number of Reports',
+            data: values,
+            backgroundColor: chartType === 'pie' ? 'rgba(54, 162, 235, 0.2)' : 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }];
+        chart.config.type = chartType;
+        chart.update();
+
+        // Update text display
+        let displayText = '';
+        if (statType === 'total-reports') {
+            displayText = `<h3>Total Reports: <strong>${statsData['total-reports'][0].value}</strong></h3>`;
+        } else {
+            displayText = `<h3>${statType.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</h3>`;
+        }
+        document.getElementById('stats-display').innerHTML = displayText;
+    }
+
+    // Initial call to set the default chart and stats display
+    updateStats();
+</script>
+{% endblock %}
