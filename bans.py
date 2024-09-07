@@ -1,6 +1,7 @@
 import sqlite3
 import requests
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class Ban:
     def __init__(self, date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason):
@@ -18,42 +19,51 @@ class Ban:
                 f"Length: {self.length}, Reason: {self.reason})")
 
 class BanScraper:
-    def __init__(self, base_url, admin_steam_id, max_pages=50):
+    def __init__(self, base_url, admin_steam_id, max_pages=100):
         self.base_url = base_url
         self.admin_steam_id = admin_steam_id
         self.max_pages = max_pages
 
+    def fetch_page(self, page_num):
+        page_url = f"{self.base_url}/index.php?page={page_num}"
+        print(f"Scraping page: {page_url}")
+        response = requests.get(page_url)
+        return response.content
+
+    def parse_bans(self, content):
+        ban_list = []
+        soup = BeautifulSoup(content, 'html.parser')
+        ban_entries = soup.find_all('tr')[1:]
+
+        for ban_entry in ban_entries:
+            columns = ban_entry.find_all('td')
+            if len(columns) > 0:
+                date = columns[0].text.strip()
+                player_name = columns[1].text.split('(<')[0].strip()
+                player_steam_id = columns[1].find('a').text.strip()
+                admin_name = columns[2].text.split('(<')[0].strip()
+                admin_steam_id = columns[2].find('a').text.strip()
+                length = columns[3].text.strip()
+                reason = columns[4].text.strip()
+
+                if admin_steam_id == self.admin_steam_id:
+                    ban = Ban(date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason)
+                    ban_list.append(ban)
+
+        return ban_list
+
     def scrape_bans(self):
         ban_list = []
-        for page_num in range(1, self.max_pages + 1):
-            page_url = f"{self.base_url}/index.php?page={page_num}"
-            print(f"Scraping page: {page_url}")
-            response = requests.get(page_url)
-            soup = BeautifulSoup(response.content, 'html.parser')
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(self.fetch_page, page_num) for page_num in range(1, self.max_pages + 1)]
 
-            # Find all rows in the table containing bans
-            ban_entries = soup.find_all('tr')[1:]  # Skip the header row
-
-            for ban_entry in ban_entries:
-                columns = ban_entry.find_all('td')
-                if len(columns) > 0:
-                    # Extract ban information
-                    date = columns[0].text.strip()
-                    player_name = columns[1].text.split('(<')[0].strip()
-                    player_steam_id = columns[1].find('a').text.strip()
-                    admin_name = columns[2].text.split('(<')[0].strip()
-                    admin_steam_id = columns[2].find('a').text.strip()
-                    length = columns[3].text.strip()
-                    reason = columns[4].text.strip()
-
-                    # Check if the admin_steam_id matches the target admin_steam_id
-                    if admin_steam_id == self.admin_steam_id:
-                        ban = Ban(date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason)
-                        ban_list.append(ban)
-
-            # If there are no more rows, stop the loop
-            if not ban_entries:
-                break
+            for future in as_completed(futures):
+                try:
+                    content = future.result()
+                    bans = self.parse_bans(content)
+                    ban_list.extend(bans)
+                except Exception as e:
+                    print(f"An error occurred: {e}")
 
         return ban_list
 

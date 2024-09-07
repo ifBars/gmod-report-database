@@ -81,12 +81,9 @@ def index():
     search_field = request.args.get('search_field', 'all')
     sort_by = request.args.get('sort_by', 'date_time')
     sort_order = request.args.get('sort_order', 'DESC')
-
-    # Base query
     query = "SELECT * FROM report WHERE 1=1"
     params = []
 
-    # Advanced Search filter
     if search_query:
         if search_field == 'all':
             query += " AND (reporter LIKE ? OR reportee LIKE ? OR report_reason LIKE ? OR punishment LIKE ?)"
@@ -128,7 +125,6 @@ def index():
                 flash('Invalid month format. Use YYYY-MM.', 'danger')
                 return redirect(url_for('index'))
 
-    # Sort by month handling
     if sort_by == 'month':
         query += " ORDER BY strftime('%Y-%m', date_time) " + sort_order
     else:
@@ -136,7 +132,6 @@ def index():
 
     reports = cursor.execute(query, params).fetchall()
 
-    # Convert sqlite3.Row objects to dictionaries and calculate ban status
     reports_list = []
     for report in reports:
         report_dict = dict(report)
@@ -147,7 +142,6 @@ def index():
 
         if "ban" in report_dict['punishment'].lower() or "propban" in report_dict['punishment'].lower():
             try:
-                # Extract duration and unit
                 parts = report_dict['punishment'].split()
                 if len(parts) < 2:
                     report_dict['ban_status'] = "Invalid Duration"
@@ -157,7 +151,6 @@ def index():
                 duration_value = int(duration_str)
                 unit = parts[1].lower()
 
-                # Calculate ban end date based on unit
                 if "day" in unit:
                     ban_end_date = report_dict['date_time'] + timedelta(days=duration_value)
                 elif "week" in unit:
@@ -177,8 +170,7 @@ def index():
                 report_dict['ban_status'] = "Invalid Duration"
         else:
             report_dict['ban_status'] = "N/A"
-
-        # Determine if the evidence is a link or file path
+            
         evidence_list = report_dict['evidence'].split(',')
         formatted_evidence = []
         for evidence in evidence_list:
@@ -205,7 +197,7 @@ def scrape_bans():
     scraper = BanScraper(BANS_URL, request.form['steam_id'].strip())
     bans = scraper.scrape_bans()
     BAN_DATABASE.insert_bans(bans)
-    flash('Bans imported successfully!', 'success')
+    return redirect(url_for('bans'))
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_report():
@@ -219,15 +211,14 @@ def add_report():
         reporter = request.form['reporter']
         reportee = request.form['reportee']
 
-        # Get all selected report reasons
         report_reasons = request.form.getlist('report_reason')
         if 'Other' in report_reasons:
             other_reason = request.form.get('other_reason', '').strip()
             if other_reason:
-                report_reasons = ['Other']  # Ensure 'Other' is always included
+                report_reasons = ['Other']
                 report_reasons.append(other_reason)
 
-        report_reason = ', '.join(report_reasons)  # Combine reasons into a comma-separated string
+        report_reason = ', '.join(report_reasons)
 
         evidence = request.form['evidence'].strip()
         punishment = request.form['punishment']
@@ -258,15 +249,14 @@ def edit_report(id):
         reporter = request.form['reporter']
         reportee = request.form['reportee']
 
-        # Get all selected report reasons
         report_reasons = request.form.getlist('report_reason')
         if 'Other' in report_reasons:
             other_reason = request.form.get('other_reason', '').strip()
             if other_reason:
-                report_reasons = ['Other']  # Ensure 'Other' is always included
+                report_reasons = ['Other']
                 report_reasons.append(other_reason)
 
-        report_reason = ', '.join(report_reasons)  # Combine reasons into a comma-separated string
+        report_reason = ', '.join(report_reasons)
 
         evidence = request.form['evidence'].strip()
         punishment = request.form['punishment']
@@ -281,16 +271,14 @@ def edit_report(id):
     report = cursor.execute('SELECT * FROM report WHERE id = ?', (id,)).fetchone()
     if report:
         report = dict(report)
-        report['date_time'] = datetime.strptime(report['date_time'], '%Y-%m-%d %H:%M:%S')  # Convert for template
+        report['date_time'] = datetime.strptime(report['date_time'], '%Y-%m-%d %H:%M:%S')
 
-        # Split the report_reason string into a list and handle 'Other'
         reasons_list = report['report_reason'].split(', ')
         if 'Other' in reasons_list:
-            report['other_reason'] = reasons_list.pop()  # Get the last item as 'Other' reason
+            report['other_reason'] = reasons_list.pop()
         else:
             report['other_reason'] = ''
 
-        # Ensure the list of reasons does not include an empty string
         report['report_reason'] = ', '.join(reasons_list)
 
     db.close()
@@ -311,21 +299,17 @@ def stats():
     db = get_db()
     cursor = db.cursor()
 
-    # Fetch statistics
     total_reports = cursor.execute('SELECT COUNT(*) FROM report').fetchone()[0]
     reports_per_reporter = cursor.execute('SELECT reporter, COUNT(*) FROM report GROUP BY reporter').fetchall()
     reports_per_reportee = cursor.execute('SELECT reportee, COUNT(*) FROM report GROUP BY reportee').fetchall()
     reports_per_reason = cursor.execute('SELECT report_reason, COUNT(*) FROM report GROUP BY report_reason').fetchall()
     monthly_reports = cursor.execute('SELECT strftime("%Y-%m", date_time) as month, COUNT(*) FROM report GROUP BY month').fetchall()
-    
     db.close()
 
-    # Convert data to JSON serializable formats
     reports_per_reporter = [{'label': row['reporter'], 'value': row[1]} for row in reports_per_reporter]
     reports_per_reportee = [{'label': row['reportee'], 'value': row[1]} for row in reports_per_reportee]
     reports_per_reason = [{'label': row['report_reason'], 'value': row[1]} for row in reports_per_reason]
     monthly_reports = [{'label': row['month'], 'value': row[1]} for row in monthly_reports]
-
     return render_template('stats.html', total_reports=total_reports,
                            reports_per_reporter=reports_per_reporter,
                            reports_per_reportee=reports_per_reportee,
@@ -353,7 +337,6 @@ def settings():
 def update_settings():
     global UPLOAD_FOLDER
 
-    # Update the upload folder path
     if 'upload_folder' in request.form:
         new_upload_folder = request.form['upload_folder'].strip()
         if os.path.isdir(new_upload_folder):
@@ -364,7 +347,6 @@ def update_settings():
         else:
             flash('Invalid folder path. Please ensure the folder exists.', 'danger')
 
-    # Check if the import CSV button was pressed
     if 'import_csv' in request.form:
         csv_path = request.form['csv_path'].strip()
         if os.path.exists(csv_path):
