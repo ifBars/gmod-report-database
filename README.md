@@ -35,12 +35,12 @@ However, if you're interested in running or modifying the app in development mod
    npm install
    ```
 
-4a. **Running the Flask server:**
+4. **Running the Flask server:**
    ```bash
    python app.py
    ```
 
-4b. **Testing the Electron app:**
+5. **Testing the Electron app:**
    ```bash
    npm start
    ```
