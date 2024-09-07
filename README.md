@@ -6,7 +6,7 @@
 ### Prerequisites
 Since this application is packaged as an executable, users do not need to install any dependencies like Python or Node.js. Simply download and run the executable file provided.
 
-However, if you're interested in running or modifying the app in development mode, the following dependencies are required:
+**However, if you're interested in running or modifying the app in development mode, the following dependencies are required:**
 - [Python 3.x](https://www.python.org/downloads/)
 - [Node.js](https://nodejs.org/en/)
 - [Flask](https://flask.palletsprojects.com/)
@@ -40,7 +40,7 @@ However, if you're interested in running or modifying the app in development mod
    python app.py
    ```
 
-5. **Testing the Electron app:** (Starting the electron app requires you to use pyinstaller on the app.spec to create the server.exe, this process will be streamlined later on)
+5. **Testing the Electron app:**
    ```bash
    npm start
    ```
@@ -61,14 +61,15 @@ The app can be packaged as a standalone executable using `electron-packager` and
 
 3. **Package the Electron app:**
    ```bash
-   electron-packager . GarnetReportApp --platform=win32 --arch=x64 --out=dist/
+   electron-packager . garnet-report-database --platform=win32 --arch=x64 --out=dist/
    ```
 
-4. The executable will be available in the `dist/` folder.
+4. **Move the exe from the dist folder:**
+   Move the app.exe from the dist/ folder, into the same directory as the packaged electron exe, and rename it to server.exe. (This process will be streamlined later on for people wishing to contribute)
 
 ### Running the Executable
 
-Once the app is packaged, users can run the `.exe` file directly. All required Python and Node.js environments are bundled with the app, so there is no need for any additional installation.
+Once the app is packaged and the server.exe has been placed in the same directory, users can run the `garnet-report-database.exe` file directly. All required Python and Node.js environments are bundled within the electron app and backend server, so there is no need for any additional installation on user end.
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
