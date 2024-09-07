@@ -40,7 +40,7 @@ However, if you're interested in running or modifying the app in development mod
    python app.py
    ```
 
-5. **Testing the Electron app:**
+5. **Testing the Electron app:** (Starting the electron app requires you to use pyinstaller on the app.spec to create the server.exe, this process will be streamlined later on)
    ```bash
    npm start
    ```
