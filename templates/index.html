@@ -4,7 +4,7 @@
 <div class="container">
     <h1 class="page-title">All Reports</h1>
     
-    <!-- Advanced Search form -->
+    <!-- Search form -->
     <form method="GET" action="{{ url_for('index') }}">
         <div class="row mb-3">
             <div class="col-md-3">
@@ -54,6 +54,7 @@
         </div>
     </form>
 
+    <!-- Table form -->
     <div class="table-container">
         <table class="table mt-3">
             <thead>
@@ -79,13 +80,10 @@
                     <td>{{ report.report_reason }}</td>
                     <td>
                         {% if report.evidence %}
-                            {% for item in report.evidence %}
-                                {% if item.type == 'link' %}
-                                    <a class="btn btn-info btn-sm" href="{{ item.url }}" target="_blank" role="button">View Link</a><br>
-                                {% elif item.type == 'file' %}
-                                    <a class="btn btn-info btn-sm" href="{{ url_for('stream_file', file_path=item.path) }}" role="button">View File</a><br>
-                                {% endif %}
-                            {% endfor %}
+                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#evidenceModal"
+                            data-evidence="{{ report.evidence }}"
+                            data-report-id="{{ report.id }}"
+                            onclick="loadEvidence(this)">View Evidence</button>                    
                         {% endif %}
                     </td>                                     
                     <td>{{ report.punishment }}</td>
@@ -106,4 +104,67 @@
         </table>
     </div>
 </div>
+
+<!-- Evidence Modal -->
+<div class="modal fade" id="evidenceModal" tabindex="-1" aria-labelledby="evidenceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="evidenceModalLabel">Evidence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="evidenceLinks">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function loadEvidence(button) {
+        var evidenceLinks = document.getElementById('evidenceLinks');
+        var evidenceData = button.getAttribute('data-evidence');
+        evidenceLinks.innerHTML = '';
+    
+        if (evidenceData) {
+            try {
+                var evidenceItems = JSON.parse(evidenceData);
+                console.log('Evidence Data:', evidenceData);
+    
+                evidenceItems.forEach(function(item) {
+                    if (item && (item.path.toLowerCase() === 'none' || item.url.toLowerCase() === 'none')) {
+                    }
+                    else if (item && item.path) {
+                        var link = document.createElement('a');
+                        link.className = 'btn btn-info btn-sm d-block mb-2';
+                        link.href = "{{ url_for('stream_file', file_path='') }}" + encodeURIComponent(item.path);
+                        link.innerText = 'View File';
+                        evidenceLinks.appendChild(link);
+                    } else if (item && item.url) {
+                        var link = document.createElement('a');
+                        link.className = 'btn btn-info btn-sm d-block mb-2';
+                        link.href = item.url;
+                        link.innerText = 'View Link';
+                        evidenceLinks.appendChild(link);
+                    }
+                });
+            } catch (e) {
+                console.error('Error parsing evidence data:', e);
+            }
+        }
+    }        
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var evidenceButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#evidenceModal"]');
+        evidenceButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var evidenceData = button.getAttribute('data-evidence');
+                console.log('Evidence Data on Click:', evidenceData);
+                loadEvidence(button);
+            });
+        });
+    });
+</script>
+
 {% endblock %}

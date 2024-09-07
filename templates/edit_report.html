@@ -5,7 +5,7 @@
 <form method="POST">
     <div class="mb-3">
         <label for="date_time" class="form-label">Date/Time</label>
-        <input type="datetime-local" class="form-control" id="date_time" name="date_time" required value="{{ report.date_time.strftime('%Y-%m-%dT%H:%M:%S') if report else '' }}">
+        <input type="datetime-local" class="form-control" id="date_time" name="date_time" required value="{{ report.date_time.strftime('%Y-%m-%dT%H:%M') if report else '' }}">
     </div>
     <div class="mb-3">
         <label for="reporter" class="form-label">Reporter</label>
@@ -16,46 +16,77 @@
         <input type="text" class="form-control" id="reportee" name="reportee" required value="{{ report.reportee if report else '' }}">
     </div>
     <div class="mb-3">
-        <label for="report_reason" class="form-label">Report Reason</label>
-        <select class="form-select" id="report_reason" name="report_reason" required onchange="toggleOtherField()">
-            <option value="" disabled>Select a reason</option>
-            <option value="RDM" {% if report and report.report_reason == 'RDM' %}selected{% endif %}>RDM</option>
-            <option value="MassRDM" {% if report and report.report_reason == 'MassRDM' %}selected{% endif %}>MassRDM</option>
-            <option value="Propblock" {% if report and report.report_reason == 'Propblock' %}selected{% endif %}>Propblock</option>
-            <option value="PB Spawn" {% if report and report.report_reason == 'PB Spawn' %}selected{% endif %}>PB Spawn</option>
-            <option value="Racism" {% if report and report.report_reason == 'Racism' %}selected{% endif %}>Racism</option>
-            <option value="NLR" {% if report and report.report_reason == 'NLR' %}selected{% endif %}>NLR</option>
-            <option value="FailRP" {% if report and report.report_reason == 'FailRP' %}selected{% endif %}>FailRP</option>
-            <option value="FailBase" {% if report and report.report_reason == 'FailBase' %}selected{% endif %}>FailBase</option>
-            <option value="Other" {% if report and report.report_reason == 'Other' %}selected{% endif %}>Other</option>
-        </select>
-        <input type="text" class="form-control mt-2 {% if not report or report.report_reason != 'Other' %}d-none{% endif %}" id="other_reason" name="other_reason" placeholder="Please specify" value="{{ report.other_reason if report and report.report_reason == 'Other' else '' }}" />
+        <label class="form-label">Report Reason</label>
+        {% set reasons = report.report_reason if report else [] %}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="rdm" name="report_reason" value="RDM" {% if 'RDM' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="rdm">RDM</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="massrdm" name="report_reason" value="MassRDM" {% if 'MassRDM' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="massrdm">MassRDM</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="nlr" name="report_reason" value="NLR" {% if 'NLR' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="nlr">NLR</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="massnlr" name="report_reason" value="MassNLR" {% if 'MassNLR' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="massnlr">MassNLR</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="propblock" name="report_reason" value="Propblock" {% if 'Propblock' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="propblock">Propblock</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="pb_spawn" name="report_reason" value="PB Spawn" {% if 'PB Spawn' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="pb_spawn">PB Spawn</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="racism" name="report_reason" value="Racism" {% if 'Racism' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="racism">Racism</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="failrp" name="report_reason" value="FailRP" {% if 'FailRP' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="failrp">FailRP</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="failbase" name="report_reason" value="FailBase" {% if 'FailBase' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="failbase">FailBase</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="ltap" name="report_reason" value="LTAP" {% if 'LTAP' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="ltap">LTAP</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="cheating" name="report_reason" value="Cheating" {% if 'Cheating' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="cheating">Cheating</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="other" name="report_reason" value="Other" {% if 'Other' in reasons %}checked{% endif %}>
+                    <label class="form-check-label" for="other">Other</label>
+                </div>
+                {% if report and report.other_reason %}
+                <div class="mb-3" id="other_reason_div" style="display: {% if 'Other' in reasons %}block{% else %}none{% endif %};">
+                    <label for="other_reason" class="form-label">Specify Other Reason</label>
+                    <input type="text" class="form-control" id="other_reason" name="other_reason" value="{{ report.other_reason if report else '' }}">
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
     <div class="mb-3">
-        <label for="evidence" class="form-label">Evidence (Comma-separated file paths)</label>
-        <textarea class="form-control" id="evidence" name="evidence" rows="3" required>{{ report.evidence if report else '' }}</textarea>
+        <label for="evidence" class="form-label">Evidence (Comma-separated file paths and/or links)</label>
+        <textarea class="form-control" id="evidence" name="evidence">{{ report.evidence if report else '' }}</textarea>
     </div>
     <div class="mb-3">
         <label for="punishment" class="form-label">Punishment</label>
-        <input type="text" class="form-control" id="punishment" name="punishment" required value="{{ report.punishment if report else '' }}">
+        <input type="text" class="form-control" id="punishment" name="punishment" value="{{ report.punishment if report else '' }}">
     </div>
-    <button type="submit" class="btn btn-success">{{ 'Update Report' if report else 'Add Report' }}</button>
+    <button type="submit" class="btn btn-primary">{{ 'Save Report' if report else 'Add Report' }}</button>
 </form>
-
-<script>
-function toggleOtherField() {
-    var select = document.getElementById('report_reason');
-    var otherField = document.getElementById('other_reason');
-    if (select.value === 'Other') {
-        otherField.classList.remove('d-none');
-    } else {
-        otherField.classList.add('d-none');
-    }
-}
-
-// Initialize the visibility of the other field based on the current value
-document.addEventListener('DOMContentLoaded', function() {
-    toggleOtherField();
-});
-</script>
 {% endblock %}

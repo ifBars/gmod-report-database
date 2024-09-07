@@ -12,7 +12,6 @@
                 <option value="reports-per-reportee">Reports per Reportee</option>
                 <option value="reports-per-reason">Reports per Reason</option>
                 <option value="monthly-reports">Monthly Reports</option>
-                <!-- Add more options as needed -->
             </select>
         </div>
         <div class="col-md-4">
@@ -21,13 +20,11 @@
                 <option value="bar">Bar Chart</option>
                 <option value="pie">Pie Chart</option>
                 <option value="line">Line Chart</option>
-                <!-- Add more chart types as needed -->
             </select>
         </div>
     </div>
 
     <div id="stats-display">
-        <!-- Default Statistic: Total Reports -->
         <h3>Total Reports: <strong>{{ total_reports }}</strong></h3>
     </div>
 
@@ -38,14 +35,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Convert Python data to JavaScript
     const statsData = {
         'total-reports': [{ label: 'Total Reports', value: {{ total_reports }} }],
         'reports-per-reporter': {{ reports_per_reporter|tojson }},
         'reports-per-reportee': {{ reports_per_reportee|tojson }},
         'reports-per-reason': {{ reports_per_reason|tojson }},
         'monthly-reports': {{ monthly_reports|tojson }},
-        // Add more data as needed
     };
 
     const ctx = document.getElementById('stats-chart').getContext('2d');
@@ -79,7 +74,6 @@
         chart.config.type = chartType;
         chart.update();
 
-        // Update text display
         let displayText = '';
         if (statType === 'total-reports') {
             displayText = `<h3>Total Reports: <strong>${statsData['total-reports'][0].value}</strong></h3>`;
@@ -88,8 +82,7 @@
         }
         document.getElementById('stats-display').innerHTML = displayText;
     }
-
-    // Initial call to set the default chart and stats display
+    
     updateStats();
 </script>
 {% endblock %}

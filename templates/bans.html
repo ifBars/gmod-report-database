@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">All Bans</h1>
+    
+    <!-- Search form -->
+    <form method="GET" action="{{ url_for('bans') }}">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <input type="text" class="form-control" name="search_query" placeholder="Search..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <select name="search_field" class="form-select">
+                    <option value="all" {% if search_field == 'all' %}selected{% endif %}>All Fields</option>
+                    <option value="player_name" {% if search_field == 'player_name' %}selected{% endif %}>Player Name</option>
+                    <option value="admin_name" {% if search_field == 'admin_name' %}selected{% endif %}>Admin Name</option>
+                    <option value="reason" {% if search_field == 'reason' %}selected{% endif %}>Ban Reason</option>
+                    <option value="date" {% if search_field == 'date' %}selected{% endif %}>Ban Date</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+                <a href="{{ url_for('bans') }}" class="btn btn-outline-danger">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Sort form -->
+    <form method="GET" action="{{ url_for('bans') }}" class="mb-3">
+        <input type="hidden" name="search_query" value="{{ search_query }}">
+        <input type="hidden" name="search_field" value="{{ search_field }}">
+        <div class="row">
+            <div class="col">
+                <select name="sort_by" class="form-select">
+                    <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Ban Date</option>
+                    <option value="player_name" {% if sort_by == 'player_name' %}selected{% endif %}>Player Name</option>
+                    <option value="admin_name" {% if sort_by == 'admin_name' %}selected{% endif %}>Admin Name</option>
+                    <option value="reason" {% if sort_by == 'reason' %}selected{% endif %}>Ban Reason</option>
+                </select>
+            </div>
+            <div class="col">
+                <select name="sort_order" class="form-select">
+                    <option value="ASC" {% if sort_order == 'ASC' %}selected{% endif %}>Ascending</option>
+                    <option value="DESC" {% if sort_order == 'DESC' %}selected{% endif %}>Descending</option>
+                </select>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-outline-secondary">Sort</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Table form -->
+    <div class="table-container">
+        <table class="table mt-3">
+            <thead>
+                <tr class="header-bar">
+                    <th>Ban Date</th>
+                    <th>Player Name</th>
+                    <th>Admin Name</th>
+                    <th>Ban Reason</th>
+                    <th>Unban Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ban in bans %}
+                <tr>
+                    <td>{{ ban.date }}</td>
+                    <td>{{ ban.player_name }}</td>
+                    <td>{{ ban.admin_name }}</td>
+                    <td>{{ ban.reason }}</td>
+                    <td>{{ ban.unban_date if ban.unban_date else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

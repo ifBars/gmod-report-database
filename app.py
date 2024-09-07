@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort
-from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap # type: ignore
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
+from bans import Ban, BanScraper, BanDatabase
 import pandas as pd
 import sqlite3
 import os
@@ -9,7 +10,6 @@ import json
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
-
 Bootstrap(app)
 CONFIG_FILE = 'config.json'
 
@@ -27,6 +27,8 @@ def write_config(config):
 config = read_config()
 UPLOAD_FOLDER = config.get('UPLOAD_FOLDER', 'E:\\Garnet-Reports')
 DATABASE = 'reports.db'
+BAN_DATABASE = BanDatabase()
+BANS_URL = "https://garnetgaming.net/darkrp/bans"
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -69,7 +71,6 @@ def import_data_from_csv(file_path):
 
 if not os.path.exists(DATABASE):
     init_db()
-    import_data_from_csv('reports.csv')
 
 @app.route('/')
 def index():
@@ -144,15 +145,27 @@ def index():
         except ValueError as e:
             print(f"Error parsing date '{report_dict['date_time']}': {e}")
 
-        if "ban" in report_dict['punishment'].lower():
+        if "ban" in report_dict['punishment'].lower() or "propban" in report_dict['punishment'].lower():
             try:
-                duration = int(report_dict['punishment'].split()[0])
-                if "day" in report_dict['punishment'].lower():
-                    ban_end_date = report_dict['date_time'] + timedelta(days=duration)
-                elif "week" in report_dict['punishment'].lower():
-                    ban_end_date = report_dict['date_time'] + timedelta(weeks=duration)
-                elif "month" in report_dict['punishment'].lower():
-                    ban_end_date = report_dict['date_time'] + timedelta(days=duration * 30)
+                # Extract duration and unit
+                parts = report_dict['punishment'].split()
+                if len(parts) < 2:
+                    report_dict['ban_status'] = "Invalid Duration"
+                    continue
+
+                duration_str = parts[0]
+                duration_value = int(duration_str)
+                unit = parts[1].lower()
+
+                # Calculate ban end date based on unit
+                if "day" in unit:
+                    ban_end_date = report_dict['date_time'] + timedelta(days=duration_value)
+                elif "week" in unit:
+                    ban_end_date = report_dict['date_time'] + timedelta(weeks=duration_value)
+                elif "month" in unit:
+                    ban_end_date = report_dict['date_time'] + timedelta(days=duration_value * 30)
+                elif "hour" in unit or "hr" in unit:
+                    ban_end_date = report_dict['date_time'] + timedelta(hours=duration_value)
                 else:
                     ban_end_date = None
 
@@ -175,12 +188,24 @@ def index():
             else:
                 formatted_evidence.append({'type': 'file', 'path': evidence})
 
-        report_dict['evidence'] = formatted_evidence
+        report_dict['evidence'] = json.dumps(formatted_evidence)
         reports_list.append(report_dict)
 
     db.close()
 
     return render_template('index.html', reports=reports_list, search_query=search_query, search_field=search_field, sort_by=sort_by, sort_order=sort_order)
+
+@app.route('/bans', methods=['GET'])
+def bans():
+    ban_list = BAN_DATABASE.get_all_bans()
+    return render_template('bans.html', bans=ban_list)
+
+@app.route('/scrape_bans', methods=['POST'])
+def scrape_bans():
+    scraper = BanScraper(BANS_URL, request.form['steam_id'].strip())
+    bans = scraper.scrape_bans()
+    BAN_DATABASE.insert_bans(bans)
+    flash('Bans imported successfully!', 'success')
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_report():
@@ -193,9 +218,16 @@ def add_report():
 
         reporter = request.form['reporter']
         reportee = request.form['reportee']
-        report_reason = request.form['report_reason']
-        if report_reason == 'Other':
-            report_reason = request.form['other_reason']  # Get the text from 'Other' field
+
+        # Get all selected report reasons
+        report_reasons = request.form.getlist('report_reason')
+        if 'Other' in report_reasons:
+            other_reason = request.form.get('other_reason', '').strip()
+            if other_reason:
+                report_reasons = ['Other']  # Ensure 'Other' is always included
+                report_reasons.append(other_reason)
+
+        report_reason = ', '.join(report_reasons)  # Combine reasons into a comma-separated string
 
         evidence = request.form['evidence'].strip()
         punishment = request.form['punishment']
@@ -225,9 +257,16 @@ def edit_report(id):
 
         reporter = request.form['reporter']
         reportee = request.form['reportee']
-        report_reason = request.form['report_reason']
-        if report_reason == 'Other':
-            report_reason = request.form['other_reason']  # Get the text from 'Other' field
+
+        # Get all selected report reasons
+        report_reasons = request.form.getlist('report_reason')
+        if 'Other' in report_reasons:
+            other_reason = request.form.get('other_reason', '').strip()
+            if other_reason:
+                report_reasons = ['Other']  # Ensure 'Other' is always included
+                report_reasons.append(other_reason)
+
+        report_reason = ', '.join(report_reasons)  # Combine reasons into a comma-separated string
 
         evidence = request.form['evidence'].strip()
         punishment = request.form['punishment']
@@ -243,11 +282,17 @@ def edit_report(id):
     if report:
         report = dict(report)
         report['date_time'] = datetime.strptime(report['date_time'], '%Y-%m-%d %H:%M:%S')  # Convert for template
-        # Add `other_reason` to the report dictionary if the reason is 'Other'
-        if report['report_reason'] == 'Other':
-            report['other_reason'] = report['report_reason']
+
+        # Split the report_reason string into a list and handle 'Other'
+        reasons_list = report['report_reason'].split(', ')
+        if 'Other' in reasons_list:
+            report['other_reason'] = reasons_list.pop()  # Get the last item as 'Other' reason
         else:
             report['other_reason'] = ''
+
+        # Ensure the list of reasons does not include an empty string
+        report['report_reason'] = ', '.join(reasons_list)
+
     db.close()
     return render_template('edit_report.html', report=report)
 
@@ -307,14 +352,27 @@ def settings():
 @app.route('/update_settings', methods=['POST'])
 def update_settings():
     global UPLOAD_FOLDER
-    new_upload_folder = request.form['upload_folder'].strip()
-    if os.path.isdir(new_upload_folder):
-        UPLOAD_FOLDER = new_upload_folder
-        config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-        write_config(config)
-        flash('Settings updated successfully!', 'success')
-    else:
-        flash('Invalid folder path. Please ensure the folder exists.', 'danger')
+
+    # Update the upload folder path
+    if 'upload_folder' in request.form:
+        new_upload_folder = request.form['upload_folder'].strip()
+        if os.path.isdir(new_upload_folder):
+            UPLOAD_FOLDER = new_upload_folder
+            config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+            write_config(config)
+            flash('Settings updated successfully!', 'success')
+        else:
+            flash('Invalid folder path. Please ensure the folder exists.', 'danger')
+
+    # Check if the import CSV button was pressed
+    if 'import_csv' in request.form:
+        csv_path = request.form['csv_path'].strip()
+        if os.path.exists(csv_path):
+            import_data_from_csv(csv_path)
+            flash('CSV data imported successfully!', 'success')
+        else:
+            flash('Invalid CSV file path. Please ensure the file exists.', 'danger')
+
     return redirect(url_for('settings'))
 
 if __name__ == '__main__':

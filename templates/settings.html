@@ -8,6 +8,24 @@
             <input type="text" class="form-control" id="upload_folder" name="upload_folder" value="{{ upload_folder }}" required>
             <div class="form-text">Specify the path to the folder containing the physical file evidence.</div>
         </div>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="submit" class="btn btn-primary" name="upload_folder">Save Changes</button>
+    </form>
+    <form action="{{ url_for('update_settings') }}" method="post">
+        <div class="mb-3">
+            <label for="csv_path" class="form-label">CSV Importing</label>
+            <input type="text" class="form-control" id="csv_path" name="csv_path" value="{{ csv_path }}" required>
+            <div class="form-text">Specify the path to the csv file.</div>
+            <a href="https://github.com/ifBars/garnet-report-database/blob/main/reports.csv" target="_blank" style="color: blue; text-decoration: underline;">Your CSV file must be formatted like this!</a>
+        </div>
+        <button type="submit" class="btn btn-primary" name="import_csv">Import CSV Data</button>
+    </form>
+    <form action="{{ url_for('scrape_bans') }}" method="post">
+        <div class="mb-3">
+            <label for="steam_id" class="form-label">Ban Importing</label>
+            <input type="text" class="form-control" id="steam_id" name="steam_id" value="{{ steam_id }}" required>
+            <div class="form-text">Specify your steam ID.</div>
+            <a href="https://steamid.io/" target="_blank" style="color: blue; text-decoration: underline;">You can find your steam ID here</a>
+        </div>
+        <button type="submit" class="btn btn-primary" name="import_bans">Import Bans</button>
     </form>
 {% endblock %}

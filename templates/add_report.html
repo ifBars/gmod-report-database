@@ -16,23 +16,65 @@
         <input type="text" class="form-control" id="reportee" name="reportee" required>
     </div>
     <div class="mb-3">
-        <label for="report_reason" class="form-label">Report Reason</label>
-        <select class="form-select" id="report_reason" name="report_reason" required onchange="toggleOtherField()">
-            <option value="" disabled selected>Select a reason</option>
-            <option value="RDM">RDM</option>
-            <option value="MassRDM">MassRDM</option>
-            <option value="Propblock">Propblock</option>
-            <option value="PB Spawn">PB Spawn</option>
-            <option value="Racism">Racism</option>
-            <option value="NLR">NLR</option>
-            <option value="FailRP">FailRP</option>
-            <option value="FailBase">FailBase</option>
-            <option value="Other">Other</option>
-        </select>
-        <input type="text" class="form-control mt-2 d-none" id="other_reason" name="other_reason" placeholder="Please specify" />
+        <label class="form-label">Report Reason</label>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="rdm" name="report_reason" value="RDM">
+                    <label class="form-check-label" for="rdm">RDM</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="massrdm" name="report_reason" value="MassRDM">
+                    <label class="form-check-label" for="massrdm">MassRDM</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="nlr" name="report_reason" value="NLR">
+                    <label class="form-check-label" for="nlr">NLR</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="massnlr" name="report_reason" value="MassNLR">
+                    <label class="form-check-label" for="massnlr">MassNLR</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="propblock" name="report_reason" value="Propblock">
+                    <label class="form-check-label" for="propblock">Propblock</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="pb_spawn" name="report_reason" value="PB Spawn">
+                    <label class="form-check-label" for="pb_spawn">PB Spawn</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="racism" name="report_reason" value="Racism">
+                    <label class="form-check-label" for="racism">Racism</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="failrp" name="report_reason" value="FailRP">
+                    <label class="form-check-label" for="failrp">FailRP</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="failbase" name="report_reason" value="FailBase">
+                    <label class="form-check-label" for="failbase">FailBase</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="ltap" name="report_reason" value="LTAP">
+                    <label class="form-check-label" for="ltap">LTAP</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="none" name="report_reason" value="None">
+                    <label class="form-check-label" for="none">None</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="other" name="report_reason" value="Other">
+                    <label class="form-check-label" for="other">Other:</label>
+                </div>
+                <input type="text" class="form-control mt-2 d-none" id="other_reason" name="other_reason" placeholder="Please specify" />
+            </div>
+        </div>
     </div>
     <div class="mb-3">
-        <label for="evidence" class="form-label">Evidence (Comma-separated file paths)</label>
+        <label for="evidence" class="form-label">Evidence (Comma-separated file paths and/or links)</label>
         <textarea class="form-control" id="evidence" name="evidence" rows="3" required></textarea>
     </div>
     <div class="mb-3">
@@ -44,13 +86,19 @@
 
 <script>
 function toggleOtherField() {
-    var select = document.getElementById('report_reason');
     var otherField = document.getElementById('other_reason');
-    if (select.value === 'Other') {
+    var otherCheckbox = document.getElementById('other');
+    if (otherCheckbox.checked) {
         otherField.classList.remove('d-none');
     } else {
         otherField.classList.add('d-none');
     }
 }
+
+// Initialize the visibility of the other field based on the current checkbox states
+document.addEventListener('DOMContentLoaded', function() {
+    toggleOtherField();
+    document.getElementById('other').addEventListener('change', toggleOtherField);
+});
 </script>
 {% endblock %}
