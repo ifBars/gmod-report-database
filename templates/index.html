@@ -133,9 +133,7 @@
                 console.log('Evidence Data:', evidenceData);
     
                 evidenceItems.forEach(function(item) {
-                    if (item && (item.path.toLowerCase() === 'none' || item.url.toLowerCase() === 'none')) {
-                    }
-                    else if (item && item.path) {
+                    if (item && item.path) {
                         var link = document.createElement('a');
                         link.className = 'btn btn-info btn-sm d-block mb-2';
                         link.href = "{{ url_for('stream_file', file_path='') }}" + encodeURIComponent(item.path);
@@ -153,7 +151,7 @@
                 console.error('Error parsing evidence data:', e);
             }
         }
-    }        
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
         var evidenceButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#evidenceModal"]');
