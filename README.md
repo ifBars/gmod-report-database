@@ -60,8 +60,8 @@ The app can be packaged as a standalone executable using `electron-packager` and
    ```
 
 3. **Package the Electron app:**
-   ```bash
    Optionally: modify package.json to package the app for a certain OS
+   ```bash
    npm run pack
    ```
 
