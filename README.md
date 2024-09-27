@@ -22,7 +22,7 @@ Since this application is packaged as an executable, users do not need to instal
 **Creating a custom theme requires knowledge of css**
 1. Download the repository, change the theme_template.css styling
 2. Replace the sapphire theme in styles.css to test your theme (open app with start.bat and select sapphire theme)
-3. Once complete, you can create a pull request and I can do the rest of implementation, or dm me the css code on discord and I can implement it :)
+3. Once completed, rename your theme (replace every sapphire with your name), then create a pull request and I can do the rest of implementation, or dm me the css code on discord and I can implement it :)
 - also if you have knowledge of html/css/js and wanna sift through my code, feel free to do the full implementation and make a pull request :D
 
 ### Development Setup
