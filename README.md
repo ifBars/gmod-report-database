@@ -60,8 +60,9 @@ The app can be packaged as a standalone executable using `electron-packager` and
    ```
 
 3. **Package the Electron app:**
+   Optionally: modify package.json to package the app for a certain OS
    ```bash
-   electron-packager . garnet-report-database --platform=win32 --arch=x64 --out=dist/
+   npm run pack
    ```
 
 4. **Move the exe from the dist folder:**
