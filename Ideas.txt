@@ -1,3 +1,0 @@
-Database backup & rollback system
-Link based evidence compatability
-Total sit/report time, make date/time a from-to thing

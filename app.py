@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort, jsonify
 from flask_bootstrap import Bootstrap # type: ignore
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
@@ -76,13 +76,25 @@ if not os.path.exists(DATABASE):
 def index():
     db = get_db()
     cursor = db.cursor()
-
+    
+    current_month = datetime.now().strftime('%Y-%m')
+    first_day_of_current_month = datetime.now().replace(day=1)
+    previous_month = (first_day_of_current_month - timedelta(days=1)).strftime('%Y-%m')
+    selected_month = request.args.get('selected_month', previous_month if request.args.get('deep_storage') == 'true' else current_month)
     search_query = request.args.get('search_query', '').strip()
     search_field = request.args.get('search_field', 'all')
     sort_by = request.args.get('sort_by', 'date_time')
     sort_order = request.args.get('sort_order', 'DESC')
+    deep_storage = request.args.get('deep_storage', 'false')
     query = "SELECT * FROM report WHERE 1=1"
     params = []
+    
+    if deep_storage == 'false':
+        query += " AND strftime('%Y-%m', date_time) = ?"
+        params.append(current_month)
+    else:
+        query += " AND strftime('%Y-%m', date_time) = ?"
+        params.append(selected_month)
 
     if search_query:
         if search_field == 'all':
@@ -171,7 +183,7 @@ def index():
         else:
             report_dict['ban_status'] = "N/A"
             
-        evidence_list = report_dict['evidence'].split(',')
+        evidence_list = report_dict['evidence'].split(',') if report_dict['evidence'] else []
         formatted_evidence = []
         for evidence in evidence_list:
             evidence = evidence.strip()
@@ -185,7 +197,7 @@ def index():
 
     db.close()
 
-    return render_template('index.html', reports=reports_list, search_query=search_query, search_field=search_field, sort_by=sort_by, sort_order=sort_order)
+    return render_template('index.html', reports=reports_list, search_query=search_query, search_field=search_field, sort_by=sort_by, sort_order=sort_order, deep_storage=deep_storage, selected_month=selected_month)
 
 @app.route('/bans', methods=['GET'])
 def bans():
@@ -220,7 +232,7 @@ def add_report():
 
         report_reason = ', '.join(report_reasons)
 
-        evidence = request.form['evidence'].strip()
+        evidence = request.form.get('evidence', '').strip()  # Use empty string if not provided
         punishment = request.form['punishment']
 
         db = get_db()
@@ -231,7 +243,10 @@ def add_report():
         db.close()
 
         flash('Report added successfully!', 'success')
-        return redirect(url_for('index'))
+        if request.form['submit_type'] == 'add_report':
+            return redirect(url_for('index'))
+        elif request.form['submit_type'] == 'add_report_and_create_another':
+            return redirect(url_for('add_report'))
 
     return render_template('add_report.html')
 
@@ -258,7 +273,7 @@ def edit_report(id):
 
         report_reason = ', '.join(report_reasons)
 
-        evidence = request.form['evidence'].strip()
+        evidence = request.form.get('evidence', '').strip()  # Use empty string if not provided
         punishment = request.form['punishment']
 
         cursor.execute('UPDATE report SET date_time = ?, reporter = ?, reportee = ?, report_reason = ?, evidence = ?, punishment = ? WHERE id = ?',
@@ -329,6 +344,24 @@ def stream_file(file_path):
         flash('File not found.', 'danger')
         return redirect(url_for('index'))
 
+@app.route('/save_hotkey', methods=['POST'])
+def save_hotkey():
+    hotkey = request.form['shortcut'].strip()
+    
+    if hotkey:
+        try:
+            with open('config.json', 'r+') as config_file:
+                config = json.load(config_file)
+                config['shortcut'] = hotkey
+                write_config(config)
+                flash('Hotkey saved successfully!', 'success')
+        except Exception as e:
+            flash('Error saving hotkey!', 'danger')
+    else:
+        flash('Invalid hotkey!', 'danger')
+        
+    return redirect(url_for('settings'))
+
 @app.route('/settings', methods=['GET'])
 def settings():
     return render_template('settings.html', upload_folder=UPLOAD_FOLDER)
@@ -356,6 +389,20 @@ def update_settings():
             flash('Invalid CSV file path. Please ensure the file exists.', 'danger')
 
     return redirect(url_for('settings'))
+
+@app.route('/autocomplete', methods=['GET'])
+def autocomplete():
+    query = request.args.get('query', '')
+    if not query:
+        return jsonify([])
+    
+    conn = sqlite3.connect('reports.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT reporter FROM report WHERE reporter LIKE ? UNION SELECT DISTINCT reportee FROM report WHERE reportee LIKE ?", ('%' + query + '%', '%' + query + '%'))
+    names = cursor.fetchall()
+    conn.close()
+    names = [name[0] for name in names]
+    return jsonify(names)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4200)

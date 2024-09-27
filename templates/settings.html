@@ -28,4 +28,39 @@
         </div>
         <button type="submit" class="btn btn-primary" name="import_bans">Import Bans</button>
     </form>
+    <form action="{{ url_for('save_hotkey')  }}" method="post">
+        <div class="mb-3">
+            <label for="shortcut" class="form-label">Add Report Hotkey</label>
+            <input id="shortcut" class="form-control" type="text" name="shortcut" placeholder="Enter your hotkey (e.g., CmdOrCtrl+R)">
+            <div class="form-text">Customize the add report hotkey.</div>
+        </div>
+        <button type="submit" class="btn btn-primary" name="save_hotkey">Save Hotkey</button>
+    </form>
+    <div class="theme-switch">
+        <label for="themeSelect">Select Theme:</label>
+        <select id="themeSelect" onchange="changeTheme()">
+            <option value="light">Light Mode</option>
+            <option value="dark">Dark Mode</option>
+            <option value="garnet">Garnet Mode</option>
+            <option value="sapphire">Sapphire Mode</option>
+            <option value="amber">Amber Mode</option>
+        </select>
+    </div>
+    
+    <script>
+        // Function to handle theme change from the dropdown
+        function changeTheme() {
+            const themeSelect = document.getElementById('themeSelect');
+            const selectedTheme = themeSelect.value; // Get the selected theme value
+            localStorage.setItem('theme', selectedTheme); // Save the selected theme in localStorage
+            applyTheme(selectedTheme); // Apply the theme immediately
+        }
+
+        // On page load, set the dropdown value based on the saved theme
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'light'; // Default to light theme
+            document.getElementById('themeSelect').value = savedTheme; // Set the dropdown value
+            applyTheme(savedTheme); // Apply the theme when the page loads
+        });
+    </script>
 {% endblock %}

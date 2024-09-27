@@ -1,3 +1,494 @@
+/* Amber Theme */
+body.amber {
+    background-color: #212121; /* Dark charcoal background */
+    color: #f8f9fa; /* Light text color */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navbar */
+body.amber .navbar {
+    background-color: #2a2a2a; /* Softer navbar background */
+    color: #f8f9fa; /* Light text for navbar */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+}
+
+body.amber .navbar-brand,
+body.amber .nav-link {
+    color: #ffb300 !important; /* Amber accent color */
+}
+
+body.amber .page-title {
+    color: #ffb300; /* Accent color for page title */
+}
+
+body.amber .bg-light {
+    background-color: #3e3e3e !important;
+    color: #e0e0e0 !important;
+}
+
+body.amber .nav-link:hover {
+    color: #ffd54f !important; /* Lighter amber on hover */
+}
+
+/* Table */
+body.amber .table {
+    background-color: #2a2a2a;
+    color: #f8f9fa;
+}
+
+body.amber .table th {
+    background-color: #3949ab; /* Header color */
+    color: #f8f9fa; /* Light text for table headers */
+}
+
+body.amber .table td {
+    border-top: 1px solid #444;
+    color: #f8f9fa;
+}
+
+/* Forms */
+body.amber .form-control {
+    background-color: #3e3e3e;
+    color: #f8f9fa;
+    border: 1px solid #555;
+}
+
+body.amber .form-control:focus {
+    border-color: #ffb300; /* Amber color on focus */
+    box-shadow: 0 0 0 0.2rem rgba(255, 179, 0, 0.25);
+}
+
+/* Statistics Container */
+body.amber .stats-container {
+    background-color: #2a2a2a;
+    color: #f8f9fa;
+}
+
+/* Styles for Amber Mode */
+body.amber #themeSelect {
+    background-color: #3e3e3e; /* Dark background for amber mode */
+    color: #ffb300; /* Amber text color */
+    border: 1px solid #ffb300; /* Amber border */
+}
+
+/* Change background and text color on hover in amber mode */
+body.amber #themeSelect:hover {
+    background-color: #505050; /* Slightly lighter amber background on hover */
+}
+
+/* Amber Mode Container */
+body.amber .container {
+    background-color: #212121; /* Dark container */
+    color: #f8f9fa;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Soft shadow */
+}
+
+/* Amber Mode Page Title */
+body.amber .page-title {
+    color: #ffd54f; /* Accent color for page title */
+}
+
+/* Amber Mode Button */
+body.amber .btn {
+    background-color: #3949ab;
+    color: #f8f9fa;
+    border: 1px solid #555;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.amber .btn:hover {
+    background-color: #5068c3;
+    color: #ffb300; /* Accent color on hover */
+}
+
+/* Amber Mode Alerts */
+body.amber .alert {
+    background-color: #333;
+    color: #f8f9fa;
+    border-left: 4px solid #ffb300; /* Retained alert border */
+}
+
+/* Amber Mode Button Containers */
+body.amber .btn-warning {
+    background-color: #e6a700;
+    color: #000;
+}
+
+body.amber .btn-danger {
+    background-color: #b82e38;
+    color: white;
+}
+
+/* Transition for Amber Mode */
+body.amber .transition {
+    transition: all 0.3s ease;
+}
+
+/* Change background and text color on hover in amber mode */
+body.amber #themeSelect:hover {
+    background-color: #666; /* Lighter dark background on hover */
+}
+
+/* Sapphire Theme */
+body.sapphire {
+    background-color: #0a192f; /* Deep navy background */
+    color: #e7efff; /* Light text color */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navbar */
+body.sapphire .navbar {
+    background-color: #112240; /* Soft navy navbar background */
+    color: #e7efff; /* Light text for navbar */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+}
+
+body.sapphire .navbar-brand,
+body.sapphire .nav-link {
+    color: #64ffda !important; /* Sapphire accent color */
+}
+
+body.sapphire .page-title {
+    color: #64ffda; /* Accent color for page title */
+}
+
+body.sapphire .bg-light {
+    background-color: #1e2a47 !important;
+    color: #d9d9d9 !important;
+}
+
+body.sapphire .nav-link:hover {
+    color: #76ffea !important; /* Lighter hover effect */
+}
+
+/* Table */
+body.sapphire .table {
+    background-color: #112240;
+    color: #e7efff;
+}
+
+body.sapphire .table th {
+    background-color: #1d2a50; /* Sapphire color for headers */
+    color: #e7efff; /* Light text for table headers */
+}
+
+body.sapphire .table td {
+    border-top: 1px solid #33415c;
+    color: #e7efff;
+}
+
+/* Forms */
+body.sapphire .form-control {
+    background-color: #1e2a47;
+    color: #e7efff;
+    border: 1px solid #33415c;
+}
+
+body.sapphire .form-control:focus {
+    border-color: #64ffda; /* Sapphire color on focus */
+    box-shadow: 0 0 0 0.2rem rgba(100, 255, 218, 0.25);
+}
+
+/* Statistics Container */
+body.sapphire .stats-container {
+    background-color: #112240;
+    color: #e7efff;
+}
+
+/* Styles for Sapphire Mode */
+body.sapphire #themeSelect {
+    background-color: #1e2a47; /* Dark background for sapphire mode */
+    color: #64ffda; /* Sapphire text color */
+    border: 1px solid #64ffda; /* Sapphire border */
+}
+
+/* Change background and text color on hover in sapphire mode */
+body.sapphire #themeSelect:hover {
+    background-color: #27455e; /* Slightly lighter sapphire background on hover */
+}
+
+/* Sapphire Mode Container */
+body.sapphire .container {
+    background-color: #0a192f; /* Deep navy container */
+    color: #e7efff;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Soft shadow */
+}
+
+/* Sapphire Mode Page Title */
+body.sapphire .page-title {
+    color: #76ffea; /* Accent color for page title */
+}
+
+/* Sapphire Mode Button */
+body.sapphire .btn {
+    background-color: #33415c;
+    color: #e7efff;
+    border: 1px solid #444;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.sapphire .btn:hover {
+    background-color: #4b627a;
+    color: #64ffda; /* Accent color on hover */
+}
+
+/* Sapphire Mode Alerts */
+body.sapphire .alert {
+    background-color: #2b3e54;
+    color: #e7efff;
+    border-left: 4px solid #64ffda; /* Retained alert border */
+}
+
+/* Sapphire Mode Button Containers */
+body.sapphire .btn-warning {
+    background-color: #e6a700;
+    color: #000;
+}
+
+body.sapphire .btn-danger {
+    background-color: #b82e38;
+    color: white;
+}
+
+/* Transition for Sapphire Mode */
+body.sapphire .transition {
+    transition: all 0.3s ease;
+}
+
+/* Change background and text color on hover in sapphire mode */
+body.sapphire #themeSelect:hover {
+    background-color: #335060; /* Lighter dark background on hover */
+}
+
+/* Garnet Theme */
+body.garnet {
+    background-color: #161716; /* Dark background */
+    color: #ffffff; /* Light text color */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navbar */
+body.garnet .navbar {
+    background-color: #30302f; /* Darker navbar background */
+    color: #ffffff; /* White text for navbar */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+body.garnet .navbar-brand,
+body.garnet .nav-link {
+    color: #c62a41 !important; /* Garnet accent color */
+}
+
+body.garnet .page-title {
+    color: #c62a41; /* Accent color for page title */
+}
+
+body.garnet .bg-light {
+    background-color: #1f1f1f !important;
+    color: #e0e0e0 !important;
+}
+
+body.garnet .nav-link:hover {
+    color: #712529 !important; /* Light hover effect */
+}
+
+/* Dark Mode Container */
+body.garnet .container {
+    background-color: #1e1e1e; /* Subtle contrast */
+    color: #e0e0e0;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Soft shadow */
+}
+
+/* Table */
+body.garnet .table {
+    background-color: #2a2a2a;
+    color: #ffffff;
+}
+
+body.garnet .table th {
+    background-color: #712529; /* Garnet color for headers */
+    color: #ffffff; /* White text for table headers */
+}
+
+body.garnet .table td {
+    border-top: 1px solid #444;
+    color: #ffffff;
+}
+
+/* Forms */
+body.garnet .form-control {
+    background-color: #30302f;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+body.garnet .form-control:focus {
+    border-color: #ce2b42; /* Garnet color on focus */
+    box-shadow: 0 0 0 0.2rem rgba(240, 90, 40, 0.25);
+}
+
+/* Statistics Container */
+body.garnet .stats-container {
+    background-color: #2a2a2a;
+    color: #ffffff;
+}
+
+/* Styles for Garnet Mode */
+body.garnet #themeSelect {
+    background-color: #2a2a2a; /* Dark background for garnet mode */
+    color: #ce2b42; /* Garnet text color */
+    border: 1px solid #ce2b42; /* Garnet border */
+}
+
+/* Change background and text color on hover in garnet mode */
+body.garnet #themeSelect:hover {
+    background-color: #3b3b3b; /* Slightly lighter garnet background on hover */
+}
+
+/* Dark Mode Styles */
+body.dark {
+    background-color: #121212; /* Darker background for a modern look */
+    color: #e0e0e0; /* Main text color */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Mode Navbar */
+body.dark .navbar {
+    background-color: #1f1f1f; /* Softer navbar background */
+    color: #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* More pronounced shadow */
+}
+
+body.dark .navbar-brand,
+body.dark .nav-link {
+    color: #f0f0f0 !important; /* Slightly softer white */
+}
+
+body.dark .nav-link:hover {
+    color: #007bff !important; /* Warm accent color on hover */
+}
+
+body.dark .bg-light {
+    background-color: #1f1f1f !important;
+    color: #e0e0e0 !important;
+}
+
+/* Dark Mode Container */
+body.dark .container {
+    background-color: #1e1e1e; /* Subtle contrast */
+    color: #e0e0e0;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Soft shadow */
+}
+
+/* Dark Mode Page Title */
+body.dark .page-title {
+    color: #007bff; /* Accent color for page title */
+}
+
+/* Dark Mode Table */
+body.dark .table {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    border-radius: 8px;
+}
+
+body.dark .table th {
+    background-color: #292929; /* Darker header background */
+    color: #007bff; /* Accent color for headers */
+}
+
+body.dark .table td {
+    border-top: 1px solid #444;
+    color: #d1d1d1;
+}
+
+/* Dark Mode Table Row Hover */
+body.dark .table tr:hover {
+    background-color: #333; /* Slightly lighter on hover */
+}
+
+/* Dark Mode Header Bar */
+body.dark .header-bar {
+    background-color: #292929;
+    color: #e0e0e0;
+}
+
+/* Dark Mode Stats Container */
+body.dark .stats-container {
+    background-color: #1f1f1f;
+    color: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Dark Mode Forms */
+body.dark .form-control {
+    background-color: #292929; /* Softer input background */
+    color: #e0e0e0;
+    border: 1px solid #444; /* More subtle border */
+}
+
+body.dark .form-control:focus {
+    border-color: #007bff; /* Accent color on focus */
+    box-shadow: 0 0 0 0.2rem rgba(255, 171, 64, 0.25); /* Accent shadow */
+}
+
+body.dark .form-label {
+    color: #e0e0e0;
+}
+
+/* Dark Mode Buttons */
+body.dark .btn {
+    background-color: #444;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark .btn:hover {
+    background-color: #555;
+    color: #007bff; /* Accent color on hover */
+}
+
+/* Dark Mode Alerts */
+body.dark .alert {
+    background-color: #333333;
+    color: #f0f0f0;
+    border-left: 4px solid #ff9800; /* Retained alert border */
+}
+
+/* Dark Mode Button Containers */
+body.dark .btn-warning {
+    background-color: #e6a700;
+    color: #000;
+}
+
+body.dark .btn-danger {
+    background-color: #b82e38;
+    color: white;
+}
+
+/* Transition for Dark Mode */
+body.dark .transition {
+    transition: all 0.3s ease;
+}
+
+/* Change background and text color on hover in dark mode */
+body.dark #themeSelect:hover {
+    background-color: #666; /* Lighter dark background on hover */
+}
+
+/* Styles for Dark Mode */
+body.dark #themeSelect {
+    background-color: #444; /* Dark background for dropdown */
+    color: #fff; /* Light text color */
+    border: 1px solid #666; /* Darker border */
+}
+
 /* General Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -112,6 +603,34 @@ body {
     background-color: #c82333;
 }
 
+/* Disabled Button Style */
+.btn-disabled {
+    background-color: #6c757d; /* Gray color */
+    border-color: #6c757d; /* Gray border */
+    color: #fff; /* White text color */
+    cursor: not-allowed; /* Change cursor to indicate unclickable */
+}
+
+.btn-disabled:hover {
+    background-color: #6c757d; /* Ensure the button color doesn't change on hover */
+    border-color: #6c757d; /* Ensure the border color remains the same */
+}
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+.ui-autocomplete .highlight {
+    font-weight: bold;
+    color: #007bff;
+}
+.loading {
+    background: url('/static/img/loader.gif') no-repeat right center;
+}
+
 /* Form Styles */
 .form-control {
     border-radius: 4px;
@@ -149,6 +668,40 @@ body {
 .stats-container h3 {
     margin-top: 0;
 }
+
+/* Dropdown Container */
+.theme-switch {
+    margin: 20px 0; /* Adds space around the dropdown */
+}
+
+/* Label for the dropdown */
+.theme-switch label {
+    font-weight: bold; /* Makes the label bold */
+    margin-right: 10px; /* Space between label and dropdown */
+}
+
+/* Dropdown Styles */
+#themeSelect {
+    padding: 8px 12px; /* Adds padding inside the dropdown */
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #fff; /* Background color for light theme */
+    color: #000; /* Text color for light theme */
+    font-size: 1rem; /* Font size */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+/* Change background and text color on hover */
+#themeSelect:hover {
+    background-color: #eaeaea; /* Lighten background on hover */
+}
+
+/* Styles for active dropdown */
+#themeSelect:focus {
+    outline: none; /* Remove outline */
+    border-color: #007bff; /* Blue border on focus */
+}
+
 
 /* Responsive Styles */
 @media (max-width: 768px) {

@@ -54,6 +54,28 @@
         </div>
     </form>
 
+    <!-- Deep Storage -->
+    <div class="mb-3 text-end">
+        {% if deep_storage == 'false' %}
+        <a href="{{ url_for('index', deep_storage='true') }}" class="btn btn-outline-info">Open Deep Storage</a>
+        {% else %}
+        <div class="mb-3 text-end">
+            <form method="GET" action="{{ url_for('index') }}">
+                <input type="hidden" name="deep_storage" value="{{ deep_storage }}">
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="month" name="selected_month" class="form-control" value="{{ selected_month }}">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-outline-secondary">Filter by Month</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <a href="{{ url_for('index', deep_storage='false') }}" class="btn btn-outline-info">Show Current Month</a>
+        {% endif %}
+    </div>
+
     <!-- Table form -->
     <div class="table-container">
         <table class="table mt-3">
@@ -79,13 +101,15 @@
                     <td>{{ report.reportee }}</td>
                     <td>{{ report.report_reason }}</td>
                     <td>
-                        {% if report.evidence %}
+                        {% if report.evidence and report.evidence != '[]' %}
                         <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#evidenceModal"
                             data-evidence="{{ report.evidence }}"
                             data-report-id="{{ report.id }}"
-                            onclick="loadEvidence(this)">View Evidence</button>                    
+                            onclick="loadEvidence(this)">View Evidence</button>
+                        {% else %}
+                        <button class="btn btn-secondary btn-sm btn-disabled" disabled>View Evidence</button>
                         {% endif %}
-                    </td>                                     
+                    </td>                               
                     <td>{{ report.punishment }}</td>
                     <td>
                         <span class="badge {% if report.ban_status == 'Active' %}bg-success{% else %}bg-danger{% endif %}">
@@ -130,7 +154,9 @@
         if (evidenceData) {
             try {
                 var evidenceItems = JSON.parse(evidenceData);
-                console.log('Evidence Data:', evidenceData);
+                if (Array.isArray(evidenceItems) && evidenceItems.length === 0) {
+                    return;
+                }
     
                 evidenceItems.forEach(function(item) {
                     if (item && item.path) {

@@ -89,4 +89,66 @@
     </div>
     <button type="submit" class="btn btn-primary">{{ 'Save Report' if report else 'Add Report' }}</button>
 </form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    $(function() {
+        // Debounce function to prevent excessive calls
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        function fetchNames(request, response) {
+            $.ajax({
+                url: "/autocomplete",
+                data: {
+                    query: request.term
+                },
+                beforeSend: function() {
+                    // Show loading spinner if necessary
+                    $("#reporter, #reportee").addClass('loading');
+                },
+                success: function(data) {
+                    // Limit the results to 5 before displaying
+                    response(data.slice(0, 5));
+                },
+                complete: function() {
+                    // Remove loading spinner
+                    $("#reporter, #reportee").removeClass('loading');
+                }
+            });
+        }
+
+        // Initialize autocomplete with debounce
+        $("#reporter, #reportee").autocomplete({
+            source: debounce(fetchNames, 100),  // 100ms debounce
+            minLength: 2,  // Start after 2 characters
+            autoFocus: true,  // Automatically focus on the first result
+            open: function() {
+                // Ensure the dropdown has the same width as the input field
+                let inputWidth = $(this).outerWidth();
+                $(this).autocomplete("widget").css({
+                    "max-height": "150px",  // Limit height for 5 items
+                    "overflow-y": "auto",   // Add scroll bar if more than 5 results
+                    "width": inputWidth + "px"  // Match width of input field
+                });
+            }
+        });
+
+        // Highlight matching parts of the autocomplete suggestions
+        $.ui.autocomplete.prototype._renderItem = function(ul, item) {
+            var term = this.term.split(' ').join('|');
+            var re = new RegExp("(" + term + ")", "gi");
+            var label = item.label.replace(re, "<span class='highlight'>$1</span>");
+            return $("<li>")
+                .append("<div>" + label + "</div>")
+                .appendTo(ul);
+        };
+    });
+</script>
 {% endblock %}
