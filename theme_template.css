@@ -1,0 +1,137 @@
+/* This is the code for the sapphire theme, if you want a custom theme, feel free to make a copy of this
+and edit the hex color values or whatever you want to make your theme. If you DO NOT know CSS, be very careful
+with the values you change. If you want your theme implemented, feel free to dm me the code on discord for it,
+and I will take a look at it. If you would like to test your theme, the EASIEST way to do so, is to leave it
+as "Sapphire" and simply replace the sapphire theme in the styles.css file, and then run app.py using python. */
+
+/* Sapphire Theme */
+body.sapphire {
+    background-color: #0a192f; /* Deep navy background */
+    color: #e7efff; /* Light text color */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navbar */
+body.sapphire .navbar {
+    background-color: #112240; /* Soft navy navbar background */
+    color: #e7efff; /* Light text for navbar */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+}
+
+body.sapphire .navbar-brand,
+body.sapphire .nav-link {
+    color: #64ffda !important; /* Sapphire accent color */
+}
+
+body.sapphire .page-title {
+    color: #64ffda; /* Accent color for page title */
+}
+
+body.sapphire .bg-light {
+    background-color: #1e2a47 !important;
+    color: #d9d9d9 !important;
+}
+
+body.sapphire .nav-link:hover {
+    color: #76ffea !important; /* Lighter hover effect */
+}
+
+/* Table */
+body.sapphire .table {
+    background-color: #112240;
+    color: #e7efff;
+}
+
+body.sapphire .table th {
+    background-color: #1d2a50; /* Sapphire color for headers */
+    color: #e7efff; /* Light text for table headers */
+}
+
+body.sapphire .table td {
+    border-top: 1px solid #33415c;
+    color: #e7efff;
+}
+
+/* Forms */
+body.sapphire .form-control {
+    background-color: #1e2a47;
+    color: #e7efff;
+    border: 1px solid #33415c;
+}
+
+body.sapphire .form-control:focus {
+    border-color: #64ffda; /* Sapphire color on focus */
+    box-shadow: 0 0 0 0.2rem rgba(100, 255, 218, 0.25);
+}
+
+/* Statistics Container */
+body.sapphire .stats-container {
+    background-color: #112240;
+    color: #e7efff;
+}
+
+/* Styles for Sapphire Mode */
+body.sapphire #themeSelect {
+    background-color: #1e2a47; /* Dark background for sapphire mode */
+    color: #64ffda; /* Sapphire text color */
+    border: 1px solid #64ffda; /* Sapphire border */
+}
+
+/* Change background and text color on hover in sapphire mode */
+body.sapphire #themeSelect:hover {
+    background-color: #27455e; /* Slightly lighter sapphire background on hover */
+}
+
+/* Sapphire Mode Container */
+body.sapphire .container {
+    background-color: #0a192f; /* Deep navy container */
+    color: #e7efff;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Soft shadow */
+}
+
+/* Sapphire Mode Page Title */
+body.sapphire .page-title {
+    color: #76ffea; /* Accent color for page title */
+}
+
+/* Sapphire Mode Button */
+body.sapphire .btn {
+    background-color: #33415c;
+    color: #e7efff;
+    border: 1px solid #444;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.sapphire .btn:hover {
+    background-color: #4b627a;
+    color: #64ffda; /* Accent color on hover */
+}
+
+/* Sapphire Mode Alerts */
+body.sapphire .alert {
+    background-color: #2b3e54;
+    color: #e7efff;
+    border-left: 4px solid #64ffda; /* Retained alert border */
+}
+
+/* Sapphire Mode Button Containers */
+body.sapphire .btn-warning {
+    background-color: #e6a700;
+    color: #000;
+}
+
+body.sapphire .btn-danger {
+    background-color: #b82e38;
+    color: white;
+}
+
+/* Transition for Sapphire Mode */
+body.sapphire .transition {
+    transition: all 0.3s ease;
+}
+
+/* Change background and text color on hover in sapphire mode */
+body.sapphire #themeSelect:hover {
+    background-color: #335060; /* Lighter dark background on hover */
+}
