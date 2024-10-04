@@ -27,11 +27,17 @@ def write_config(config):
 config = read_config()
 UPLOAD_FOLDER = config.get('UPLOAD_FOLDER', 'E:\\Garnet-Reports')
 DATABASE = 'reports.db'
+BANDATABASEFILE = 'bans.db'
 BAN_DATABASE = BanDatabase()
 BANS_URL = "https://garnetgaming.net/darkrp/bans"
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_ban_db():
+    conn = sqlite3.connect(BANDATABASEFILE)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -143,6 +149,7 @@ def index():
         query += f" ORDER BY {sort_by} {sort_order}"
 
     reports = cursor.execute(query, params).fetchall()
+    report_count = len(reports)
 
     reports_list = []
     for report in reports:
@@ -197,12 +204,60 @@ def index():
 
     db.close()
 
-    return render_template('index.html', reports=reports_list, search_query=search_query, search_field=search_field, sort_by=sort_by, sort_order=sort_order, deep_storage=deep_storage, selected_month=selected_month)
+    return render_template('index.html', reports=reports_list, search_query=search_query, search_field=search_field, sort_by=sort_by, sort_order=sort_order, deep_storage=deep_storage, selected_month=selected_month, report_count=report_count)
 
 @app.route('/bans', methods=['GET'])
 def bans():
-    ban_list = BAN_DATABASE.get_all_bans()
-    return render_template('bans.html', bans=ban_list)
+    db = get_ban_db()
+    cursor = db.cursor()
+
+    search_query = request.args.get('search_query', '').strip()
+    search_field = request.args.get('search_field', 'all')
+    sort_by = request.args.get('sort_by', 'date')
+    sort_order = request.args.get('sort_order', 'DESC')
+
+    query = "SELECT * FROM bans WHERE 1=1"
+    params = []
+
+    # Implementing search functionality
+    if search_query:
+        if search_field == 'all':
+            query += " AND (player_name LIKE ? OR admin_name LIKE ? OR reason LIKE ?)"
+            like_query = f'%{search_query}%'
+            params.extend([like_query, like_query, like_query])
+        elif search_field == 'player_name':
+            query += " AND player_name LIKE ?"
+            params.append(f'%{search_query}%')
+        elif search_field == 'admin_name':
+            query += " AND admin_name LIKE ?"
+            params.append(f'%{search_query}%')
+        elif search_field == 'reason':
+            query += " AND reason LIKE ?"
+            params.append(f'%{search_query}%')
+        elif search_field == 'date':
+            try:
+                date_query = datetime.strptime(search_query, '%Y-%m-%d')
+                query += " AND date(date) = ?"
+                params.append(date_query.strftime('%Y-%m-%d'))
+            except ValueError:
+                flash('Invalid date format. Use YYYY-MM-DD.', 'danger')
+                return redirect(url_for('bans'))
+
+    # Implementing sorting functionality
+    if sort_by in ['date', 'player_name', 'admin_name', 'reason']:
+        query += f" ORDER BY {sort_by} {sort_order}"
+
+    bans = cursor.execute(query, params).fetchall()
+
+    # Converting results to a list of dictionaries
+    bans_list = []
+    for ban in bans:
+        ban_dict = dict(ban)
+        bans_list.append(ban_dict)
+
+    db.close()
+
+    return render_template('bans.html', bans=bans_list, search_query=search_query, search_field=search_field, sort_by=sort_by, sort_order=sort_order)
 
 @app.route('/scrape_bans', methods=['POST'])
 def scrape_bans():
@@ -249,6 +304,39 @@ def add_report():
             return redirect(url_for('add_report'))
 
     return render_template('add_report.html')
+
+@app.route('/add_ban', methods=['GET', 'POST'])
+def add_ban():
+    if request.method == 'POST':
+        try:
+            date_time = datetime.strptime(request.form['date_time'], '%Y-%m-%dT%H:%M')
+        except ValueError:
+            flash('Invalid date/time format.', 'danger')
+            return redirect(url_for('add_ban'))
+
+        banned = request.form['banned_user']
+
+        ban_reasons = request.form.getlist('ban_reason')
+        if 'Other' in ban_reasons:
+            other_reason = request.form.get('other_reason', '').strip()
+            if other_reason:
+                ban_reasons = ['Other']
+                ban_reasons.append(other_reason)
+
+        ban_reason = ', '.join(ban_reasons)
+
+        evidence = request.form.get('evidence', '').strip()  # Use empty string if not provided
+        length = request.form['length']
+        ban_item = Ban(date_time, banned, "", "You", "", evidence, length, ban_reason)
+        BAN_DATABASE.insert_ban(ban_item)
+
+        flash('Ban added successfully!', 'success')
+        if request.form['submit_type'] == 'add_ban':
+            return redirect(url_for('bans'))
+        elif request.form['submit_type'] == 'add_ban_and_create_another':
+            return redirect(url_for('add_ban'))
+
+    return render_template('add_ban.html')
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_report(id):

@@ -4,13 +4,14 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class Ban:
-    def __init__(self, date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason):
+    def __init__(self, date, player_name, player_steam_id, admin_name, admin_steam_id, evidence, length, reason):
         self.date = date
         self.player_name = player_name
         self.player_steam_id = player_steam_id
         self.admin_name = admin_name
         self.admin_steam_id = admin_steam_id
         self.length = length
+        self.evidence = evidence
         self.reason = reason
 
     def __repr__(self):
@@ -43,11 +44,12 @@ class BanScraper:
                 player_steam_id = columns[1].find('a').text.strip()
                 admin_name = columns[2].text.split('(<')[0].strip()
                 admin_steam_id = columns[2].find('a').text.strip()
+                evidence = ""
                 length = columns[3].text.strip()
                 reason = columns[4].text.strip()
 
                 if admin_steam_id == self.admin_steam_id:
-                    ban = Ban(date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason)
+                    ban = Ban(date, player_name, player_steam_id, admin_name, admin_steam_id, evidence, length, reason)
                     ban_list.append(ban)
 
         return ban_list
@@ -84,6 +86,7 @@ class BanDatabase:
                     admin_name TEXT,
                     admin_steam_id TEXT,
                     length TEXT,
+                    evidence TEXT,
                     reason TEXT
                 )
             ''')
@@ -96,6 +99,15 @@ class BanDatabase:
                 INSERT INTO bans (date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', [(ban.date, ban.player_name, ban.player_steam_id, ban.admin_name, ban.admin_steam_id, ban.length, ban.reason) for ban in bans])
+            conn.commit()
+
+    def insert_ban(self, ban):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO bans (date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (ban.date, ban.player_name, ban.player_steam_id, ban.admin_name, ban.admin_steam_id, ban.length, ban.reason))
             conn.commit()
 
     def get_all_bans(self):
