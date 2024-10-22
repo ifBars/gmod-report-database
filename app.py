@@ -30,6 +30,7 @@ DATABASE = 'reports.db'
 BANDATABASEFILE = 'bans.db'
 BAN_DATABASE = BanDatabase()
 BANS_URL = "https://garnetgaming.net/darkrp/bans"
+is_scraping_bans = False
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -261,10 +262,13 @@ def bans():
 
 @app.route('/scrape_bans', methods=['POST'])
 def scrape_bans():
-    scraper = BanScraper(BANS_URL, request.form['steam_id'].strip())
-    bans = scraper.scrape_bans()
-    BAN_DATABASE.insert_bans(bans)
-    return redirect(url_for('bans'))
+    if not is_scraping_bans:
+        is_scraping_bans = True
+        scraper = BanScraper(BANS_URL, request.form['steam_id'].strip())
+        bans = scraper.scrape_bans()
+        BAN_DATABASE.insert_bans(bans)
+        is_scraping_bans = False
+        return redirect(url_for('bans'))
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_report():
