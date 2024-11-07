@@ -1,80 +1,68 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Add New Report</h1>
+<h1>Add New Ban</h1>
 <form method="POST">
     <div class="mb-3">
         <label for="date_time" class="form-label">Date/Time</label>
         <input type="datetime-local" class="form-control" id="date_time" name="date_time" required>
     </div>
     <div class="mb-3">
-        <label for="reporter" class="form-label">Reporter</label>
-        <input type="text" class="form-control" id="reporter" name="reporter" required>
+        <label for="banned_user" class="form-label">Banned User</label>
+        <input type="text" class="form-control" id="banned_user" name="banned_user" required>
     </div>
     <div class="mb-3">
-        <label for="reportee" class="form-label">Reportee</label>
-        <input type="text" class="form-control" id="reportee" name="reportee" required>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Report Reason</label>
+        <label class="form-label">Ban Reason</label>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="rdm" name="report_reason" value="RDM">
+                    <input type="checkbox" class="form-check-input" id="rdm" name="ban_reason" value="RDM">
                     <label class="form-check-label" for="rdm">RDM</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="massrdm" name="report_reason" value="MassRDM">
+                    <input type="checkbox" class="form-check-input" id="massrdm" name="ban_reason" value="MassRDM">
                     <label class="form-check-label" for="massrdm">MassRDM</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="nlr" name="report_reason" value="NLR">
-                    <label class="form-check-label" for="nlr">NLR</label>
+                    <input type="checkbox" class="form-check-input" id="nitrp" name="ban_reason" value="NITRP">
+                    <label class="form-check-label" for="nitrp">NITRP</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="failrp" name="report_reason" value="FailRP">
+                    <input type="checkbox" class="form-check-input" id="failrp" name="ban_reason" value="FailRP">
                     <label class="form-check-label" for="failrp">FailRP</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="massnlr" name="report_reason" value="MassNLR">
+                    <input type="checkbox" class="form-check-input" id="massnlr" name="ban_reason" value="MassNLR">
                     <label class="form-check-label" for="massnlr">MassNLR</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="propblock" name="report_reason" value="Propblock">
-                    <label class="form-check-label" for="propblock">Propblock</label>
-                </div>
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="pb_spawn" name="report_reason" value="PB Spawn">
+                    <input type="checkbox" class="form-check-input" id="pb_spawn" name="ban_reason" value="PB Spawn">
                     <label class="form-check-label" for="pb_spawn">PB Spawn</label>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="racism" name="report_reason" value="Racism">
+                    <input type="checkbox" class="form-check-input" id="racism" name="ban_reason" value="Racism">
                     <label class="form-check-label" for="racism">Racism</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="advertising" name="report_reason" value="Advertising">
+                    <input type="checkbox" class="form-check-input" id="advertising" name="ban_reason" value="Advertising">
                     <label class="form-check-label" for="advertising">Advertising</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="homophobia" name="report_reason" value="Homophobia">
+                    <input type="checkbox" class="form-check-input" id="homophobia" name="ban_reason" value="Homophobia">
                     <label class="form-check-label" for="homophobia">Homophobia</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="failbase" name="report_reason" value="FailBase">
-                    <label class="form-check-label" for="failbase">FailBase</label>
-                </div>
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="ltap" name="report_reason" value="LTAP">
+                    <input type="checkbox" class="form-check-input" id="ltap" name="ban_reason" value="LTAP">
                     <label class="form-check-label" for="ltap">LTAP</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="none" name="report_reason" value="None">
+                    <input type="checkbox" class="form-check-input" id="none" name="ban_reason" value="None">
                     <label class="form-check-label" for="none">None</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="other" name="report_reason" value="Other">
+                    <input type="checkbox" class="form-check-input" id="other" name="ban_reason" value="Other">
                     <label class="form-check-label" for="other">Other:</label>
                 </div>
                 <input type="text" class="form-control mt-2 d-none" id="other_reason" name="other_reason" placeholder="Please specify" />
@@ -86,11 +74,11 @@
         <textarea class="form-control" id="evidence" name="evidence"></textarea>
     </div>
     <div class="mb-3">
-        <label for="punishment" class="form-label">Punishment</label>
-        <input type="text" class="form-control" id="punishment" name="punishment" required>
+        <label for="length" class="form-label">Ban Length</label>
+        <input type="text" class="form-control" id="length" name="length" required>
     </div>
-    <button type="submit" class="btn btn-success" name="submit_type" value="add_report">Add Report</button>
-    <button type="submit" class="btn btn-primary" name="submit_type" value="add_report_and_create_another">Add Report and Create Another</button>
+    <button type="submit" class="btn btn-success" name="submit_type" value="add_ban">Add Ban</button>
+    <button type="submit" class="btn btn-primary" name="submit_type" value="add_ban_and_create_another">Add Ban and Create Another</button>
 </form>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

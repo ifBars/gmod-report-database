@@ -1,5 +1,5 @@
-# garnet-report-database
- A Python webapp, wrapped in Electron, to run locally on virtually any platform, for GarnetGaming DarkRP staff to track their reports taken.
+# gmod-report-database
+ A Python webapp, wrapped in Electron, to run locally on virtually any platform, for Gmod DarkRP staff to track their reports taken.
 
 ## Getting Started
 
@@ -14,8 +14,8 @@ Since this application is packaged as an executable, users do not need to instal
 
 ### Running the app
 
-1. Extract the garnet-report-database folder to somewhere like your desktop and open it
-2. Run the garnet-report-database.exe and wait 1-3 seconds for the backend server to load
+1. Extract the gmod-report-database folder to somewhere like your desktop and open it
+2. Run the gmod-report-database.exe and wait 1-3 seconds for the backend server to load
 
 ### Creating a custom theme
 
@@ -29,8 +29,8 @@ Since this application is packaged as an executable, users do not need to instal
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/ifBars/garnet-report-database
-   cd garnet-report-database
+   git clone https://github.com/ifBars/gmod-report-database
+   cd gmod-report-database
    ```
 
 2. **Install Python dependencies:**
@@ -78,7 +78,7 @@ The app can be packaged as a standalone executable using `electron-packager` and
 
 ### Running the Executable
 
-Once the app is packaged and the server.exe has been placed in the same directory, users can run the `garnet-report-database.exe` file directly. All required Python and Node.js environments are bundled within the electron app and backend server, so there is no need for any additional installation on user end.
+Once the app is packaged and the server.exe has been placed in the same directory, users can run the `gmod-report-database.exe` file directly. All required Python and Node.js environments are bundled within the electron app and backend server, so there is no need for any additional installation on user end.
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.

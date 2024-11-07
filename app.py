@@ -11,6 +11,7 @@ import json
 app = Flask(__name__)
 app.config.from_object('config.Config')
 Bootstrap(app)
+is_scraping_bans = False
 CONFIG_FILE = 'config.json'
 
 def read_config():
@@ -30,7 +31,6 @@ DATABASE = 'reports.db'
 BANDATABASEFILE = 'bans.db'
 BAN_DATABASE = BanDatabase()
 BANS_URL = "https://garnetgaming.net/darkrp/bans"
-is_scraping_bans = False
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -254,6 +254,16 @@ def bans():
     bans_list = []
     for ban in bans:
         ban_dict = dict(ban)
+        evidence_list = ban_dict['evidence'].split(',') if ban_dict['evidence'] else []
+        formatted_evidence = []
+        for evidence in evidence_list:
+            evidence = evidence.strip()
+            if evidence.startswith('http://') or evidence.startswith('https://'):
+                formatted_evidence.append({'type': 'link', 'url': evidence})
+            else:
+                formatted_evidence.append({'type': 'file', 'path': evidence})
+
+        ban_dict['evidence'] = json.dumps(formatted_evidence)
         bans_list.append(ban_dict)
 
     db.close()
@@ -262,6 +272,7 @@ def bans():
 
 @app.route('/scrape_bans', methods=['POST'])
 def scrape_bans():
+    global is_scraping_bans
     if not is_scraping_bans:
         is_scraping_bans = True
         scraper = BanScraper(BANS_URL, request.form['steam_id'].strip())

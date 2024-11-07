@@ -17,7 +17,7 @@ class Ban:
     def __repr__(self):
         return (f"Ban(Date: {self.date}, Player: {self.player_name}, PlayerSteamID: {self.player_steam_id}, "
                 f"Admin: {self.admin_name}, AdminSteamID: {self.admin_steam_id}, "
-                f"Length: {self.length}, Reason: {self.reason})")
+                f"Length: {self.length}, Reason: {self.reason}), Evidence: {self.evidence}")
 
 class BanScraper:
     def __init__(self, base_url, admin_steam_id, max_pages=100):
@@ -96,18 +96,18 @@ class BanDatabase:
         with sqlite3.connect(self.db_name) as conn:
             cursor = conn.cursor()
             cursor.executemany('''
-                INSERT INTO bans (date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', [(ban.date, ban.player_name, ban.player_steam_id, ban.admin_name, ban.admin_steam_id, ban.length, ban.reason) for ban in bans])
+                INSERT INTO bans (date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason, evidence)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', [(ban.date, ban.player_name, ban.player_steam_id, ban.admin_name, ban.admin_steam_id, ban.length, ban.reason, ban.evidence) for ban in bans])
             conn.commit()
 
     def insert_ban(self, ban):
         with sqlite3.connect(self.db_name) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO bans (date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (ban.date, ban.player_name, ban.player_steam_id, ban.admin_name, ban.admin_steam_id, ban.length, ban.reason))
+                INSERT INTO bans (date, player_name, player_steam_id, admin_name, admin_steam_id, length, reason, evidence)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (ban.date, ban.player_name, ban.player_steam_id, ban.admin_name, ban.admin_steam_id, ban.length, ban.reason, ban.evidence))
             conn.commit()
 
     def get_all_bans(self):

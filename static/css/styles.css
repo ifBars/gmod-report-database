@@ -1,3 +1,130 @@
+/* Pink Theme */
+body.pink {
+    background-color: #ffe6f1; /* Soft light pink background */
+    color: #4a004e; /* Dark magenta text */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navbar */
+body.pink .navbar {
+    background-color: #ffaad4; /* Pastel pink navbar */
+    color: #4a004e; /* Dark magenta text for navbar */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+}
+
+body.pink .navbar-brand,
+body.pink .nav-link {
+    color: #ff69b4 !important; /* Hot pink accent */
+}
+
+body.pink .page-title {
+    color: #ff69b4; /* Hot pink for page title */
+}
+
+body.pink .bg-light {
+    background-color: #ffc1e3 !important;
+    color: #4a004e !important;
+}
+
+body.pink .nav-link:hover {
+    color: #ff85d1 !important; /* Lighter pink hover effect */
+}
+
+/* Table */
+body.pink .table {
+    background-color: #ffaad4;
+    color: #4a004e;
+}
+
+body.pink .table th {
+    background-color: #ff69b4; /* Bright pink headers */
+    color: #fff; /* White text for table headers */
+}
+
+body.pink .table td {
+    border-top: 1px solid #ff85d1;
+    color: #4a004e;
+}
+
+/* Forms */
+body.pink .form-control {
+    background-color: #ffc1e3;
+    color: #4a004e;
+    border: 1px solid #ff69b4;
+}
+
+body.pink .form-control:focus {
+    border-color: #ff69b4; /* Pink on focus */
+    box-shadow: 0 0 0 0.2rem rgba(255, 105, 180, 0.25);
+}
+
+/* Statistics Container */
+body.pink .stats-container {
+    background-color: #ffaad4;
+    color: #4a004e;
+}
+
+/* Styles for Pink Mode */
+body.pink #themeSelect {
+    background-color: #ffc1e3; /* Pink dropdown */
+    color: #ff69b4; /* Hot pink text */
+    border: 1px solid #ff69b4; /* Hot pink border */
+}
+
+/* Change background and text color on hover in pink mode */
+body.pink #themeSelect:hover {
+    background-color: #ff85d1; /* Slightly darker pink on hover */
+}
+
+/* Pink Mode Container */
+body.pink .container {
+    background-color: #ffe6f1; /* Soft pink container */
+    color: #4a004e;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Soft shadow */
+}
+
+/* Pink Mode Button */
+body.pink .btn {
+    background-color: #ff69b4;
+    color: #fff;
+    border: 1px solid #ff85d1;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.pink .btn:hover {
+    background-color: #ff85d1;
+    color: #4a004e; /* Darker pink on hover */
+}
+
+/* Pink Mode Alerts */
+body.pink .alert {
+    background-color: #ffaad4;
+    color: #4a004e;
+    border-left: 4px solid #ff69b4;
+}
+
+/* Pink Mode Button Containers */
+body.pink .btn-warning {
+    background-color: #ffcc66;
+    color: #000;
+}
+
+body.pink .btn-danger {
+    background-color: #ff3366;
+    color: white;
+}
+
+/* Transition for Pink Mode */
+body.pink .transition {
+    transition: all 0.3s ease;
+}
+
+/* Change background and text color on hover in pink mode */
+body.pink #themeSelect:hover {
+    background-color: #ffb3da; /* Lighter pink background on hover */
+}
+
 /* Amber Theme */
 body.amber {
     background-color: #212121; /* Dark charcoal background */
