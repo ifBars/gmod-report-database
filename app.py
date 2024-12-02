@@ -40,6 +40,14 @@ def get_db():
 def get_ban_db():
     conn = sqlite3.connect(BANDATABASEFILE)
     conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(bans)")
+    columns = [column[1] for column in cursor.fetchall()]
+
+    if 'evidence' not in columns:
+        cursor.execute("ALTER TABLE bans ADD COLUMN evidence TEXT")
+                    
+    conn.commit()
     return conn
 
 def init_db():
