@@ -829,6 +829,34 @@ body {
     border-color: #007bff; /* Blue border on focus */
 }
 
+/* Ensure table rows have specific styling for reports and bans */
+#reportsTableBody tr.table-primary {
+    background-color: #e0f7fa !important; /* Light cyan background */
+    color: #004d40 !important; /* Dark teal text color */
+    font-weight: bold !important; /* Make the text bold */
+}
+
+#bansTableBody tr.table-info {
+    background-color: #e3f2fd !important; /* Light blue background */
+    color: #01579b !important; /* Dark blue text color */
+    font-style: italic !important; /* Italic text for bans */
+}
+
+/* Hover effect for both reports and bans */
+#reportsTableBody tr:hover, #bansTableBody tr:hover {
+    background-color: #c8e6c9 !important; /* Light green background on hover */
+}
+
+/* Specific styling for table rows */
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: #f5f5f5 !important; /* Light gray for odd rows */
+    color: #000000 !important; /* Text color for odd rows */
+}
+
+/* Ensure alternating row colors */
+.table-striped > tbody > tr:nth-child(even) {
+    background-color: #ffffff !important; /* White for even rows */
+}
 
 /* Responsive Styles */
 @media (max-width: 768px) {

@@ -11,8 +11,8 @@ class Ban:
         self.admin_name = admin_name
         self.admin_steam_id = admin_steam_id
         self.length = length
-        self.evidence = evidence
         self.reason = reason
+        self.evidence = evidence
 
     def __repr__(self):
         return (f"Ban(Date: {self.date}, Player: {self.player_name}, PlayerSteamID: {self.player_steam_id}, "
@@ -20,7 +20,7 @@ class Ban:
                 f"Length: {self.length}, Reason: {self.reason}), Evidence: {self.evidence}")
 
 class BanScraper:
-    def __init__(self, base_url, admin_steam_id, max_pages=100):
+    def __init__(self, base_url, admin_steam_id, max_pages=50):
         self.base_url = base_url
         self.admin_steam_id = admin_steam_id
         self.max_pages = max_pages
@@ -56,7 +56,7 @@ class BanScraper:
 
     def scrape_bans(self):
         ban_list = []
-        with ThreadPoolExecutor(max_workers=10) as executor:
+        with ThreadPoolExecutor(max_workers=5) as executor:
             futures = [executor.submit(self.fetch_page, page_num) for page_num in range(1, self.max_pages + 1)]
 
             for future in as_completed(futures):
@@ -86,8 +86,8 @@ class BanDatabase:
                     admin_name TEXT,
                     admin_steam_id TEXT,
                     length TEXT,
-                    evidence TEXT,
-                    reason TEXT
+                    reason TEXT,
+                    evidence TEXT
                 )
             ''')
             conn.commit()

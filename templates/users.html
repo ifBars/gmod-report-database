@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container my-5">
+        <input type="text" id="searchBar" class="form-control mb-4" placeholder="Search for a user...">
+        <button id="searchButton" class="btn btn-primary mb-4">Search</button>
+
+        <div id="user-info" class="mb-4">
+            <h3>Username: <span id="username">None</span></h3>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reports-section" class="mb-5">
+            <h2>Reports</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Report ID</th>
+                        <th>Date</th>
+                        <th>Reason</th>
+                        <th>Punishment</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsTableBody">
+                    <!-- Dynamic rows will be injected here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bans Section -->
+        <div id="bans-section" class="mb-5">
+            <h2>Bans</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Ban ID</th>
+                        <th>Date</th>
+                        <th>Length</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody id="bansTableBody">
+                    <!-- Dynamic rows will be injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function fetchUserInfo(username) {
+            fetch(`/search_user?username=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+
+                    // Update username in user-info section
+                    document.getElementById('username').textContent = data.username;
+
+                    // Populate reports
+                    const reportsTableBody = document.getElementById('reportsTableBody');
+                    reportsTableBody.innerHTML = '';
+                    data.reports.forEach(report => {
+                        const row = `<tr class="table-primary">
+                            <td>${report.id}</td>
+                            <td>${report.date_time}</td>
+                            <td>${report.report_reason}</td>
+                            <td>${report.punishment}</td>
+                        </tr>`;
+                        reportsTableBody.innerHTML += row;
+                    });
+
+                    // Populate bans
+                    const bansTableBody = document.getElementById('bansTableBody');
+                    bansTableBody.innerHTML = '';
+                    data.bans.forEach(ban => {
+                        const row = `<tr class="table-info">
+                            <td>${ban.id}</td>
+                            <td>${ban.date}</td>
+                            <td>${ban.length}</td>
+                            <td>${ban.reason}</td>
+                        </tr>`;
+                        bansTableBody.innerHTML += row;
+                    });
+                })
+                .catch(err => console.error('Error fetching user info:', err));
+        }
+
+        // Search button click event
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const username = document.getElementById('searchBar').value;
+            if (username) {
+                fetchUserInfo(username);
+            } else {
+                alert('Please enter a username');
+            }
+        });
+    </script>
+{% endblock %}

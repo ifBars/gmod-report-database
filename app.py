@@ -3,16 +3,22 @@ from flask_bootstrap import Bootstrap # type: ignore
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
 from bans import Ban, BanScraper, BanDatabase
-import pandas as pd
 import sqlite3
+import io
 import os
+import csv
 import json
+import re
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
 Bootstrap(app)
-is_scraping_bans = False
 CONFIG_FILE = 'config.json'
+DATABASE = 'reports.db'
+BANDATABASEFILE = 'bans.db'
+BAN_DATABASE = BanDatabase(BANDATABASEFILE)
+BANS_URL = "https://garnetgaming.net/darkrp/bans"
+is_scraping_bans = False
 
 def read_config():
     if os.path.exists(CONFIG_FILE):
@@ -21,16 +27,12 @@ def read_config():
     else:
         return {}
 
+config = read_config()
+UPLOAD_FOLDER = config.get('UPLOAD_FOLDER', 'E:\\Garnet-Reports')
+
 def write_config(config):
     with open(CONFIG_FILE, 'w') as file:
         json.dump(config, file, indent=4)
-
-config = read_config()
-UPLOAD_FOLDER = config.get('UPLOAD_FOLDER', 'E:\\Garnet-Reports')
-DATABASE = 'reports.db'
-BANDATABASEFILE = 'bans.db'
-BAN_DATABASE = BanDatabase()
-BANS_URL = "https://garnetgaming.net/darkrp/bans"
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -63,29 +65,109 @@ def init_db():
             db.commit()
         db.close()
 
+if not os.path.exists(DATABASE):
+    init_db()
+
 def import_data_from_csv(file_path):
     with app.app_context():
         if os.path.exists(file_path):
             try:
-                data = pd.read_csv(file_path, header=None, on_bad_lines='skip')
-                data.columns = ['Date/Time', 'Reporter', 'Reportee', 'Report Reason', 'Evidence', 'Punishment']
-                
                 db = get_db()
                 cursor = db.cursor()
-                for _, row in data.iterrows():
-                    try:
-                        date_time = datetime.strptime(row['Date/Time'], '%m/%d/%Y %I:%M %p')
-                        cursor.execute('INSERT INTO report (date_time, reporter, reportee, report_reason, evidence, punishment) VALUES (?, ?, ?, ?, ?, ?)',
-                                       (date_time, row['Reporter'], row['Reportee'], row['Report Reason'], row['Evidence'], row['Punishment']))
-                    except ValueError as e:
-                        print(f"Error parsing date '{row['Date/Time']}': {e}")
+                
+                with open(file_path, mode='r', newline='', encoding='utf-8') as file:
+                    reader = csv.reader(file)
+                    for row in reader:
+                        try:
+                            date_time = datetime.strptime(row[0], '%m/%d/%Y %I:%M %p')
+                            reporter = row[1]
+                            reportee = row[2]
+                            report_reason = row[3]
+                            evidence = row[4]
+                            punishment = row[5]
+                            
+                            cursor.execute('INSERT INTO report (date_time, reporter, reportee, report_reason, evidence, punishment) VALUES (?, ?, ?, ?, ?, ?)',
+                                           (date_time, reporter, reportee, report_reason, evidence, punishment))
+                        except ValueError as e:
+                            print(f"Error parsing date '{row[0]}': {e}")
+                
                 db.commit()
                 db.close()
-            except pd.errors.ParserError as e:
+            except Exception as e:
                 print(f"Error reading CSV file: {e}")
 
-if not os.path.exists(DATABASE):
-    init_db()
+def export_report_to_csv():
+    output = io.BytesIO()
+    wrapper = io.TextIOWrapper(output, encoding='utf-8', newline='')
+    writer = csv.writer(wrapper)
+    conn = sqlite3.connect('reports.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM report")
+    rows = cursor.fetchall()
+    writer.writerow(["ID", "Date/Time", "Reporter", "Reportee", "Report Reason", "Evidence", "Punishment"])
+    writer.writerows(rows)
+    conn.close()
+    wrapper.flush()
+    output.seek(0)
+    output_binary = io.BytesIO(output.getvalue())
+    return send_file(output_binary, mimetype='text/csv', as_attachment=True, download_name='exported_reports.csv')
+
+@app.route('/search_user', methods=['GET'])
+def search_user():
+    username = request.args.get('username')
+    db = get_db()
+    ban_db = get_ban_db()
+    cursor = db.cursor()
+    ban_cursor = ban_db.cursor()
+
+    def clean_player_name(player_name):
+        cleaned_name = re.sub(r"\(.*\)", "", player_name).strip()
+        return cleaned_name
+
+    query = "SELECT * FROM report WHERE reporter = ? OR reportee = ?"
+    params = [username, username]
+    reports = cursor.execute(query, params).fetchall()
+    bans = ban_cursor.execute("SELECT * FROM bans").fetchall()
+    cleaned_username = clean_player_name(username)
+
+    filtered_bans = []
+    for ban in bans:
+        ban_player_name = ban[2]
+        cleaned_ban_player_name = clean_player_name(ban_player_name)
+
+        if cleaned_ban_player_name == cleaned_username:
+            filtered_bans.append({
+                "id": ban[0],
+                "date": ban[1],
+                "length": ban[6] or 'N/A',
+                "reason": ban[8],
+                "player_name": ban_player_name
+            })
+
+    db.close()
+    ban_db.close()
+
+    user_data = {
+        "username": username,
+        "reports": [
+            {
+                "id": report[0],
+                "date_time": report[1],
+                "report_reason": report[4],
+                "punishment": report[6] or 'N/A'
+            } for report in reports
+        ],
+        "bans": filtered_bans
+    }
+
+    if user_data["reports"] or user_data["bans"]:
+        return jsonify(user_data)
+    else:
+        return jsonify({"error": "User not found"}), 404
+
+@app.route('/export_reports')
+def export_reports():
+    return export_report_to_csv()
 
 @app.route('/')
 def index():
@@ -215,6 +297,10 @@ def index():
 
     return render_template('index.html', reports=reports_list, search_query=search_query, search_field=search_field, sort_by=sort_by, sort_order=sort_order, deep_storage=deep_storage, selected_month=selected_month, report_count=report_count)
 
+@app.route('/users', methods=['GET'])
+def users():
+    return render_template('users.html')
+
 @app.route('/bans', methods=['GET'])
 def bans():
     db = get_ban_db()
@@ -228,7 +314,6 @@ def bans():
     query = "SELECT * FROM bans WHERE 1=1"
     params = []
 
-    # Implementing search functionality
     if search_query:
         if search_field == 'all':
             query += " AND (player_name LIKE ? OR admin_name LIKE ? OR reason LIKE ?)"
@@ -252,13 +337,11 @@ def bans():
                 flash('Invalid date format. Use YYYY-MM-DD.', 'danger')
                 return redirect(url_for('bans'))
 
-    # Implementing sorting functionality
     if sort_by in ['date', 'player_name', 'admin_name', 'reason']:
         query += f" ORDER BY {sort_by} {sort_order}"
 
     bans = cursor.execute(query, params).fetchall()
 
-    # Converting results to a list of dictionaries
     bans_list = []
     for ban in bans:
         ban_dict = dict(ban)
@@ -283,7 +366,11 @@ def scrape_bans():
     global is_scraping_bans
     if not is_scraping_bans:
         is_scraping_bans = True
-        scraper = BanScraper(BANS_URL, request.form['steam_id'].strip())
+        steam_id = request.form['steam_id'].strip()
+        with open('steam_id.txt', 'w') as file:
+            file.write(steam_id)
+        
+        scraper = BanScraper(BANS_URL, steam_id)
         bans = scraper.scrape_bans()
         BAN_DATABASE.insert_bans(bans)
         is_scraping_bans = False
@@ -310,7 +397,7 @@ def add_report():
 
         report_reason = ', '.join(report_reasons)
 
-        evidence = request.form.get('evidence', '').strip()  # Use empty string if not provided
+        evidence = request.form.get('evidence', '').strip()
         punishment = request.form['punishment']
 
         db = get_db()
@@ -348,7 +435,7 @@ def add_ban():
 
         ban_reason = ', '.join(ban_reasons)
 
-        evidence = request.form.get('evidence', '').strip()  # Use empty string if not provided
+        evidence = request.form.get('evidence', '').strip()
         length = request.form['length']
         ban_item = Ban(date_time, banned, "", "You", "", evidence, length, ban_reason)
         BAN_DATABASE.insert_ban(ban_item)
@@ -384,7 +471,7 @@ def edit_report(id):
 
         report_reason = ', '.join(report_reasons)
 
-        evidence = request.form.get('evidence', '').strip()  # Use empty string if not provided
+        evidence = request.form.get('evidence', '').strip()
         punishment = request.form['punishment']
 
         cursor.execute('UPDATE report SET date_time = ?, reporter = ?, reportee = ?, report_reason = ?, evidence = ?, punishment = ? WHERE id = ?',
@@ -448,7 +535,6 @@ def stream_file(file_path):
         flash('Invalid file path.', 'danger')
         return redirect(url_for('index'))
     safe_path = os.path.join(UPLOAD_FOLDER, file_path)
-    #print(f"Safe path: {safe_path}")  # Debug print
     if os.path.isfile(safe_path):
         return send_file(safe_path, as_attachment=True)
     else:
@@ -475,7 +561,13 @@ def save_hotkey():
 
 @app.route('/settings', methods=['GET'])
 def settings():
-    return render_template('settings.html', upload_folder=UPLOAD_FOLDER)
+    steam_id = ''
+    try:
+        with open('steam_id.txt', 'r') as file:
+            steam_id = file.read().strip()
+    except FileNotFoundError:
+        pass
+    return render_template('settings.html', upload_folder=UPLOAD_FOLDER, steam_id=steam_id)
 
 @app.route('/update_settings', methods=['POST'])
 def update_settings():
@@ -501,6 +593,42 @@ def update_settings():
 
     return redirect(url_for('settings'))
 
+@app.route('/user/<username>/reports', methods=['GET'])
+def user_reports(username):
+    db = get_db()
+    cursor = db.cursor()
+    
+    query = "SELECT * FROM report WHERE reporter = ? OR reportee = ?"
+    params = [username, username]
+
+    reports = cursor.execute(query, params).fetchall()
+    reports_list = []
+    for report in reports:
+        report_dict = dict(report)
+        report_dict['evidence'] = json.loads(report_dict.get('evidence', '[]'))
+        reports_list.append(report_dict)
+
+    db.close()
+    return jsonify(reports_list)
+
+@app.route('/user/<username>/bans', methods=['GET'])
+def user_bans(username):
+    db = get_ban_db()
+    cursor = db.cursor()
+    
+    query = "SELECT * FROM bans WHERE player_name = ?"
+    params = [username]
+
+    bans = cursor.execute(query, params).fetchall()
+    bans_list = []
+    for ban in bans:
+        ban_dict = dict(ban)
+        ban_dict['evidence'] = json.loads(ban_dict.get('evidence', '[]'))
+        bans_list.append(ban_dict)
+
+    db.close()
+    return jsonify(bans_list)
+
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
     query = request.args.get('query', '')
@@ -516,4 +644,4 @@ def autocomplete():
     return jsonify(names)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4200)
+    app.run(host='0.0.0.0', port=4200, debug=False)

@@ -56,23 +56,21 @@
 
     <!-- Deep Storage -->
     <div class="mb-3 text-end">
+        <a href="{{ url_for('export_reports') }}" class="btn btn-outline-success">Export All Reports to CSV</a>
         {% if deep_storage == 'false' %}
         <a href="{{ url_for('index', deep_storage='true') }}" class="btn btn-outline-info">Open Deep Storage</a>
         {% else %}
+        <a href="{{ url_for('index', deep_storage='false') }}" class="btn btn-outline-info">Show Current Month</a>
         <div class="mb-3 text-end">
             <form method="GET" action="{{ url_for('index') }}">
                 <input type="hidden" name="deep_storage" value="{{ deep_storage }}">
                 <div class="row">
                     <div class="col-md-4">
-                        <input type="month" name="selected_month" class="form-control" value="{{ selected_month }}">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-outline-secondary">Filter by Month</button>
+                        <input type="month" name="selected_month" class="form-control" value="{{ selected_month }}" onchange="this.form.submit()">
                     </div>
                 </div>
             </form>
         </div>
-        <a href="{{ url_for('index', deep_storage='false') }}" class="btn btn-outline-info">Show Current Month</a>
         {% endif %}
     </div>
 
