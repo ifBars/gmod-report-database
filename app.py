@@ -593,42 +593,6 @@ def update_settings():
 
     return redirect(url_for('settings'))
 
-@app.route('/user/<username>/reports', methods=['GET'])
-def user_reports(username):
-    db = get_db()
-    cursor = db.cursor()
-    
-    query = "SELECT * FROM report WHERE reporter = ? OR reportee = ?"
-    params = [username, username]
-
-    reports = cursor.execute(query, params).fetchall()
-    reports_list = []
-    for report in reports:
-        report_dict = dict(report)
-        report_dict['evidence'] = json.loads(report_dict.get('evidence', '[]'))
-        reports_list.append(report_dict)
-
-    db.close()
-    return jsonify(reports_list)
-
-@app.route('/user/<username>/bans', methods=['GET'])
-def user_bans(username):
-    db = get_ban_db()
-    cursor = db.cursor()
-    
-    query = "SELECT * FROM bans WHERE player_name = ?"
-    params = [username]
-
-    bans = cursor.execute(query, params).fetchall()
-    bans_list = []
-    for ban in bans:
-        ban_dict = dict(ban)
-        ban_dict['evidence'] = json.loads(ban_dict.get('evidence', '[]'))
-        bans_list.append(ban_dict)
-
-    db.close()
-    return jsonify(bans_list)
-
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
     query = request.args.get('query', '')
